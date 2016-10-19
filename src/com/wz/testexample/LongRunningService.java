@@ -20,6 +20,7 @@ import org.json.JSONObject;
 
 
 
+import android.annotation.SuppressLint;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -68,7 +69,7 @@ public class LongRunningService extends Service {
          if (wakeLock ==null) {
                 Log.i("result","Acquiring wake lock");
                 PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
-                wakeLock = pm.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, this.getClass().getCanonicalName());
+                wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, this.getClass().getCanonicalName());
                 wakeLock.acquire();
             }
         
@@ -97,6 +98,9 @@ public class LongRunningService extends Service {
 	            
 	        }
 	    }
+	 private long exitTime = 0;
+	 
+	 
 	 
 	 
 	 
@@ -113,7 +117,7 @@ public class LongRunningService extends Service {
 	String codeString=null;
 	//放要Post的数据
 	public static String s1,s2,s3,s4,s9,s10,s11=null;
-	 private long exitTime = 0;
+	 
 	 Timer mTimer = new Timer();
 	 
 	 public static long ts;
@@ -182,7 +186,7 @@ public class LongRunningService extends Service {
 public IBinder onBind(Intent intent) {
 return null;
 }
-@Override
+@SuppressLint("NewApi") @Override
 public int onStartCommand(Intent intent, int flags, int startId) {
 new Thread(new Runnable() {
 @Override
@@ -401,7 +405,7 @@ Intent i = new Intent(this, AlarmReceiver.class);
 //i.setAction("repeating");
 //pi代表闹钟需要执行的动作
 PendingIntent pi = PendingIntent.getBroadcast(this, 0, i,0);
-manager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, triggerAtTime, pi);
+manager.setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP, triggerAtTime, pi);
 //manager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 10*1000*60, pi);
 Log.i("result","两次相隔时间424行"+LongRunningService.ts);
 
@@ -418,10 +422,6 @@ public void setTimerTask(){
 		public void run() {
 			String getPath = urlPath + "&tid=" + tid;
 			JSONObject jObject = null;
-			
-			
-			
-			
 			
 			
 			
