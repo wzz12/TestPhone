@@ -321,14 +321,14 @@ private String postData() {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			
+			Log.i("result","323行异常出现原因"+e.getMessage());
 			mTimer.cancel();
 			//取消定时
 			AlarmManager managerc = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 			Intent i = new Intent(LongRunningService.this, AlarmReceiver.class);
 			PendingIntent pi = PendingIntent.getBroadcast(LongRunningService.this, 0, i,0);
 			managerc.cancel(pi);
-			
+			Log.i("result","目标服务器不存在或已关机");
 			//sendSMS(s10, "目标服务器不存在或已关机");
 			//用Handler进行消息的传递
 			vHandler.post(new Runnable(){
@@ -405,7 +405,8 @@ Intent i = new Intent(this, AlarmReceiver.class);
 //i.setAction("repeating");
 //pi代表闹钟需要执行的动作
 PendingIntent pi = PendingIntent.getBroadcast(this, 0, i,0);
-manager.setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP, triggerAtTime, pi);
+//4.4以上才有setExact方法按照准确的时间
+manager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, triggerAtTime, pi);
 //manager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 10*1000*60, pi);
 Log.i("result","两次相隔时间424行"+LongRunningService.ts);
 
