@@ -1,0 +1,36 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+    <TextView
+        android:id="@+id/s"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="测试"
+        
+        />
+   
+
+   
+
+        <Button
+            android:id="@+id/bts"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Settings" 
+           android:layout_alignParentBottom="true"
+            android:layout_marginLeft="20dp"
+            
+            />
+         <Button
+            android:id="@+id/btr"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Run"
+            android:layout_toRightOf="@id/bts"
+            android:layout_marginLeft="120dp"
+              android:layout_alignParentBottom="true"/>
+    
+
+</RelativeLayout>
