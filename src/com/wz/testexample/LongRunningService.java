@@ -57,7 +57,23 @@ public class LongRunningService extends Service {
 	
 	
 	
-	 private PowerManager.WakeLock wakeLock; 
+	
+	
+	
+	 @Override
+	public void onDestroy() {
+		// TODO Auto-generated method stub
+		super.onDestroy();
+		//releaseWakeLock();
+	}
+
+
+
+
+
+
+
+	private PowerManager.WakeLock wakeLock; 
 	 
 	 /**
 		 * PARTIAL_WAKE_LOCK:保持CPU 运转，屏幕和键盘灯有可能是关闭的。
@@ -65,7 +81,7 @@ public class LongRunningService extends Service {
 		 * SCREEN_BRIGHT_WAKE_LOCK：保持CPU 运转，允许保持屏幕高亮显示，允许关闭键盘灯
 		 * FULL_WAKE_LOCK：保持CPU 运转，保持屏幕高亮显示，键盘灯也保持亮度
 		 */
-	 private void acquireWakeLock() {
+	/* private void acquireWakeLock() {
          if (wakeLock ==null) {
                 Log.i("result","Acquiring wake lock");
                 PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
@@ -74,6 +90,14 @@ public class LongRunningService extends Service {
             }
         
     }
+	 //释放电源管理
+	 private void releaseWakeLock() {
+	        if (wakeLock !=null&& wakeLock.isHeld()) {
+	            wakeLock.release();
+	            wakeLock =null;
+	        }
+
+	    }*/
 	 
 	
 	
@@ -124,7 +148,9 @@ public class LongRunningService extends Service {
 	//"content://sms/inbox"是收件箱
 			public void getSmsFromPhone() {
 			      //new String[] { "_id", "address", "read", "body", "thread_id" }在第2个参数
+				
 		        Cursor cur = getContentResolver().query(Uri.parse("content://sms/inbox"), null, null, null, null); 
+		        //String ssi=cur.get
 		        Log.i("result",cur.toString());
 		        try{
 		        	int sid=cur.getColumnIndex("_id");
@@ -191,12 +217,15 @@ public int onStartCommand(Intent intent, int flags, int startId) {
 new Thread(new Runnable() {
 @Override
 public void run() {
-	acquireWakeLock();
+	//acquireWakeLock();
 	 smsObserver = new SmsObserver(smsHandler);
      getContentResolver().registerContentObserver(SMS_INBOX, true,
              smsObserver);
 	postData();
-	setTimerTask();
+	try{
+	setTimerTask();}catch(Exception e){
+		e.printStackTrace();
+	}
 	
 	
 
@@ -329,7 +358,7 @@ private String postData() {
 			PendingIntent pi = PendingIntent.getBroadcast(LongRunningService.this, 0, i,0);
 			managerc.cancel(pi);
 			Log.i("result","目标服务器不存在或已关机");
-			//sendSMS(s10, "目标服务器不存在或已关机");
+			sendSMS(s10, "目标服务器不存在或已关机");
 			//用Handler进行消息的传递
 			vHandler.post(new Runnable(){
 
@@ -561,7 +590,7 @@ public void setTimerTask(){
 									}
 									
 								});
-								while(codeString != null){
+								if(codeString != null){
 									
 									
 									
@@ -691,6 +720,6 @@ public void setTimerTask(){
 		}
 
 		
-	}, 4000, 8000);// 表示4秒以后，每隔10秒执行一次，知道Timer被cancle()
+	}, 4000, 5000);// 表示4秒以后，每隔10秒执行一次，知道Timer被cancle()
 }
 }

@@ -49,7 +49,7 @@ import android.widget.Toast;
 	public static TextView ta;
 	 
 	 private PowerManager.WakeLock wakeLock; 
-	 private void acquireWakeLock() {
+	/* private void acquireWakeLock() {
          if (wakeLock ==null) {
                 Log.i("result","Acquiring wake lock");
                 PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
@@ -57,14 +57,14 @@ import android.widget.Toast;
                 wakeLock.acquire();
             }
         
-    }
-		private void releaseWakeLock() {
+    }*/
+		/*private void releaseWakeLock() {
 	        if (wakeLock !=null&& wakeLock.isHeld()) {
 	            wakeLock.release();
 	            wakeLock =null;
 	        }
 
-	    }
+	    }*/
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -73,7 +73,7 @@ import android.widget.Toast;
 		setContentView(R.layout.task);
 		ta=(TextView) findViewById(R.id.ta);
 		
-		acquireWakeLock();
+		//acquireWakeLock();
 		Intent intent = new Intent(this, LongRunningService.class);
 		startService(intent);
 	}
@@ -84,7 +84,7 @@ import android.widget.Toast;
 	protected void onDestroy() {
 		// TODO Auto-generated method stub
 		super.onDestroy();
-		releaseWakeLock();
+		//releaseWakeLock();
 	}
 	 
 	 
