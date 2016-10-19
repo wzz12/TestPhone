@@ -48,7 +48,9 @@
         </activity>
         <service android:name=".LongRunningService" >
 </service>
-<receiver android:name=".AlarmReceiver" >
+<!-- 在AlarmManager应用中，如果设定定时器的进程被终止，定时器Broadcast就发不出来，BroadcastReceiver也就启动不了。因此设置BroadcastReceiver的process属性为启动新进程还是很有必要的 -->
+<receiver android:name=".AlarmReceiver"
+     android:process=":newinst" >
 </receiver>
         
     </application>

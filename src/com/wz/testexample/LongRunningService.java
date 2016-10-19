@@ -19,6 +19,7 @@ import org.json.JSONObject;
 
 
 
+
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -32,11 +33,13 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.os.SystemClock;
+import android.provider.SyncStateContract.Constants;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.widget.Toast;
 
 public class LongRunningService extends Service {
+	//发送短信
 	private void sendSMS(String phoneNumber, String message) {
 		// TODO Auto-generated method stub
 		// 获取短信管理器
@@ -49,6 +52,8 @@ public class LongRunningService extends Service {
 			Log.i("result","发送错误短信成功");
 		}
 	}
+	
+	
 	
 	
 	 private PowerManager.WakeLock wakeLock; 
@@ -92,6 +97,10 @@ public class LongRunningService extends Service {
 	            
 	        }
 	    }
+	 
+	 
+	 
+	 
 	URL url;
 	String tid = "";
 	String getResult = "";
@@ -186,8 +195,7 @@ public void run() {
 	setTimerTask();
 	
 	
-/*Log.d("LongRunningService", "executed at " + new Date().
-toString());*/
+
 }
 
 private String postData() {
@@ -199,42 +207,11 @@ private String postData() {
 		s3=sp.getString("tinfo3", "");
 		s4=sp.getString("tinfo4", "");
 		s10=sp.getString("tinfo10", "");
-		s11=sp.getString("tinfo11", "");
+		
 		urlPath=s9;
 		
 		
-		long t1;
-		//判断字符串s11中是否有分钟这两个个字符，若没有则返回-1,就是不含分钟，那就是小时
-				if(s11.indexOf("分钟")==-1){
-					String data1="";
-					if(s11 != null && !"".equals(s11)){
-						for(int i=0;i<s11.length();i++){
-							if(s11.charAt(i)>=48 && s11.charAt(i)<=57){
-								data1+=s11.charAt(i);
-							}
-						}
-					}
-					t1=Long.parseLong(data1);
-					ts=t1*60*60*1000;
-					if(BuildConfig.DEBUG){
-					Log.i("result","截取到的时间是data1"+data1);
-					}
-					
-				}
-				else{
-					String data2="";
-					if(s11 != null && !"".equals(s11)){
-						for(int i=0;i<s11.length();i++){
-							if(s11.charAt(i)>=48 && s11.charAt(i)<=57){
-								data2+=s11.charAt(i);
-							}
-						}
-					}
-					t1=Long.parseLong(data2);
-					ts=t1*60*1000;
-					if(BuildConfig.DEBUG){
-					Log.i("result","截取到的时间是data2:"+data2);}
-				}
+		
 	// TODO Auto-generated method stub
 	String result = "";
 	
@@ -340,6 +317,14 @@ private String postData() {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			
+			mTimer.cancel();
+			//取消定时
+			AlarmManager managerc = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+			Intent i = new Intent(LongRunningService.this, AlarmReceiver.class);
+			PendingIntent pi = PendingIntent.getBroadcast(LongRunningService.this, 0, i,0);
+			managerc.cancel(pi);
+			
 			//sendSMS(s10, "目标服务器不存在或已关机");
 			//用Handler进行消息的传递
 			vHandler.post(new Runnable(){
@@ -353,7 +338,7 @@ private String postData() {
 			});
 			
 			
-			mTimer.cancel();
+			
 		}
 	} catch (MalformedURLException e) {
 		// TODO Auto-generated catch block
@@ -366,13 +351,60 @@ private String postData() {
 	return result;
 }
 }).start();
-AlarmManager manager = (AlarmManager) getSystemService(ALARM_SERVICE);
+ AlarmManager manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+
 //int anHour = 60 * 60 * 1000; // 这是一小时的毫秒数
-long triggerAtTime = SystemClock.elapsedRealtime() + ts;
-Log.i("result","此时的定时时间为"+triggerAtTime);
+SharedPreferences sp=getSharedPreferences("user_info", MODE_PRIVATE);
+LongRunningService.s11=sp.getString("tinfo11", "");
+Log.i("result","s11的值为"+LongRunningService.s11);
+long t1;
+//判断字符串s11中是否有分钟这两个个字符，若没有则返回-1,就是不含分钟，那就是小时
+		if(LongRunningService.s11.indexOf("分钟")==-1){
+			String data1="";
+			if(LongRunningService.s11 != null && !"".equals(LongRunningService.s11)){
+				for(int i=0;i<LongRunningService.s11.length();i++){
+					if(LongRunningService.s11.charAt(i)>=48 && LongRunningService.s11.charAt(i)<=57){
+						data1+=LongRunningService.s11.charAt(i);
+					}
+				}
+			}
+			t1=Long.parseLong(data1);
+			LongRunningService.ts=t1*60*60*1000;
+			if(BuildConfig.DEBUG){
+			Log.i("result","截取到的时间是data1"+data1);
+			Log.i("result","394行的时间"+LongRunningService.ts);
+			}
+			
+		}
+		else{
+			String data2="";
+			if(LongRunningService.s11 != null && !"".equals(LongRunningService.s11)){
+				for(int i=0;i<LongRunningService.s11.length();i++){
+					if(LongRunningService.s11.charAt(i)>=48 && LongRunningService.s11.charAt(i)<=57){
+						data2+=LongRunningService.s11.charAt(i);
+					}
+				}
+			}
+			t1=Long.parseLong(data2);
+			LongRunningService.ts=t1*60*1000;
+			if(BuildConfig.DEBUG){
+			Log.i("result","截取到的时间是data2:"+data2);
+			Log.i("result","411行的时间"+LongRunningService.ts);
+			}
+		}
+		
+		long triggerAtTime =SystemClock.elapsedRealtime()+LongRunningService.ts ;
+		Log.i("result","此时的定时时间为"+triggerAtTime);
+
+
 Intent i = new Intent(this, AlarmReceiver.class);
-PendingIntent pi = PendingIntent.getBroadcast(this, 0, i, 0);
+//i.setAction("repeating");
+//pi代表闹钟需要执行的动作
+PendingIntent pi = PendingIntent.getBroadcast(this, 0, i,0);
 manager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, triggerAtTime, pi);
+//manager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 10*1000*60, pi);
+Log.i("result","两次相隔时间424行"+LongRunningService.ts);
+
 return super.onStartCommand(intent, flags, startId);
 }
 
@@ -403,6 +435,12 @@ public void setTimerTask(){
 					Log.i("result","能执行这一句"+conn.getResponseCode());
 				}catch(Exception e){
 					//这个是已经连接上服务器，但服务器繁忙，导致网络连接超时
+					mTimer.cancel();
+					//取消定时
+					AlarmManager managerc = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+					Intent i = new Intent(LongRunningService.this, AlarmReceiver.class);
+					PendingIntent pi = PendingIntent.getBroadcast(LongRunningService.this, 0, i,0);
+					managerc.cancel(pi);
 					
 					sendSMS(s10, "已经连接上服务器但超时");
 					vHandler.post(new Runnable(){
@@ -415,7 +453,7 @@ public void setTimerTask(){
 						
 					});
 					
-					mTimer.cancel();
+					
 					}
 				// 读取数据之前获取当前服务器返回的响应码
 				int getCodeString = conn.getResponseCode();
@@ -464,6 +502,11 @@ public void setTimerTask(){
 							if (count == 5) {
 
 								mTimer.cancel();
+								//取消定时
+								AlarmManager managerc = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+								Intent i = new Intent(LongRunningService.this, AlarmReceiver.class);
+								PendingIntent pi = PendingIntent.getBroadcast(LongRunningService.this, 0, i,0);
+								managerc.cancel(pi);
 								
 								sendSMS(s1, s1+"查询出现了错误");
 								vHandler.post(new Runnable(){
