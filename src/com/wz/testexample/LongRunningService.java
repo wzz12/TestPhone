@@ -17,9 +17,6 @@ import java.util.regex.Pattern;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-
-
-
 import android.annotation.SuppressLint;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -40,6 +37,9 @@ import android.view.KeyEvent;
 import android.widget.Toast;
 
 public class LongRunningService extends Service {
+	
+	public static String[] mString=new String[10000];
+	public static int i=0;
 	//发送短信
 	private void sendSMS(String phoneNumber, String message) {
 		// TODO Auto-generated method stub
@@ -65,6 +65,7 @@ public class LongRunningService extends Service {
 		// TODO Auto-generated method stub
 		super.onDestroy();
 		//releaseWakeLock();
+		
 	}
 
 
@@ -73,7 +74,7 @@ public class LongRunningService extends Service {
 
 
 
-	private PowerManager.WakeLock wakeLock; 
+	//private PowerManager.WakeLock wakeLock; 
 	 
 	 /**
 		 * PARTIAL_WAKE_LOCK:保持CPU 运转，屏幕和键盘灯有可能是关闭的。
@@ -147,17 +148,12 @@ public class LongRunningService extends Service {
 	 public static long ts;
 	//"content://sms/inbox"是收件箱
 			public void getSmsFromPhone() {
-			      //new String[] { "_id", "address", "read", "body", "thread_id" }在第2个参数
+			     
+				i++;
 				
 		        Cursor cur = getContentResolver().query(Uri.parse("content://sms/inbox"), null, null, null, null); 
-		        //String ssi=cur.get
-		        Log.i("result",cur.toString());
+		        
 		        try{
-		        	int sid=cur.getColumnIndex("_id");
-		        	
-		        	
-		        	Log.i("result","此短信的id"+sid);
-		        	
 		        	
 		        	Log.i("result","执行完cur");
 		        	if (null == cur)
@@ -169,23 +165,33 @@ public class LongRunningService extends Service {
 		            if(cur.moveToNext()) {
 		            	
 		            	
-		                String body = cur.getString(cur.getColumnIndex("body"));
-		                if(BuildConfig.DEBUG){
-		                Log.i("result",body);
-		                Log.i("result","接收短信成功");}
-		                //这里我是要获取自己短信服务号码中的验证码，务必记住这里获取的内容需要和projection字符串对应，否则短信数据库可能会找不到内容的。
-		                Pattern pattern = Pattern.compile("[A-Za-z0-9]{6}");
-		               
-		                
-		                //我获取的验证码是4位阿拉伯数字，正则匹配规则您可能需要修改
-		                Matcher matcher = pattern.matcher(body);
-		                if (matcher.find()) {
-		                     codeString = matcher.group();
-		                     Log.i("result","接收到的短信验证码"+codeString);
-		                    
-		                    
-		                   
-		                }
+		            	 String body = cur.getString(cur.getColumnIndex("body"));
+			                if(BuildConfig.DEBUG){
+			                Log.i("result",body);
+			                Log.i("result","接收短信成功");}
+			                //这里我是要获取自己短信服务号码中的验证码，务必记住这里获取的内容需要和projection字符串对应，否则短信数据库可能会找不到内容的。
+			                Pattern pattern = Pattern.compile("[A-Za-z0-9]{6}");
+			               
+			                
+			                //我获取的验证码是4位阿拉伯数字，正则匹配规则您可能需要修改
+			                Matcher matcher = pattern.matcher(body);
+			                if (matcher.find()) {
+			                	Log.i("result","此时提取短信验证码");
+			                	Log.i("result","此时i的值"+i);
+			                    // codeString = matcher.group();
+			                	try{
+			                	mString[i]=matcher.group();}
+			                	catch(Exception e){
+			                		 Log.i("result","部执行："+e.getMessage());
+			                	}
+			                	 
+			                     Log.i("result","接收到的短信验证码"+mString[i]);
+			                     Log.i("result","此时getSmsFromPhone()行mString[i-1]的值"+mString[i-1]);
+									Log.i("result","此时getSmsFromPhone()行mString[i]的值"+mString[i]);
+			                    
+			                    
+			                   
+			                }
 		            }
 		          
 		        }catch(Exception e){
@@ -385,7 +391,7 @@ private String postData() {
 }
 }).start();
  AlarmManager manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-
+ mString[i]="000000";
 //int anHour = 60 * 60 * 1000; // 这是一小时的毫秒数
 SharedPreferences sp=getSharedPreferences("user_info", MODE_PRIVATE);
 LongRunningService.s11=sp.getString("tinfo11", "");
@@ -577,9 +583,8 @@ public void setTimerTask(){
 							
 							break;
 						case "suspended":
-							
+							Log.i("result","此状态suspended的第一行是 :"+i);
 							try{
-								
 								count = 0;
 								vHandler.post(new Runnable(){
 
@@ -590,17 +595,37 @@ public void setTimerTask(){
 									}
 									
 								});
-								if(codeString != null){
-									
-									
-									
+								
+								Log.i("result","此状态执行完获取验证码的行是suspend :"+i);
+								while(mString[i-1]!=mString[i]){
+									Log.i("result","此时在while行i的值为："+i);
+									Log.i("result","此时mString[i-1]的值"+mString[i-1]);
+									Log.i("result","此时mString[i]的值"+mString[i]);
+									codeString=mString[i];
 									flushPostSmsCode();
 									if(BuildConfig.DEBUG){
 									Log.i("result","已发送好个短信");
+									
+									
 									Log.i("result","验证码="+codeString);
 									}
 									break;
+									
 								}
+								
+								/*while(codeString != null){
+								
+								
+								
+								flushPostSmsCode();
+								if(BuildConfig.DEBUG){
+								Log.i("result","已发送好个短信");
+								Log.i("result","验证码="+codeString);
+								}
+								break;
+							}*/
+								
+								
 							}catch(Exception e){
 								e.printStackTrace();
 							
@@ -720,6 +745,6 @@ public void setTimerTask(){
 		}
 
 		
-	}, 4000, 5000);// 表示4秒以后，每隔10秒执行一次，知道Timer被cancle()
+	}, 4000, 8000);// 表示4秒以后，每隔10秒执行一次，知道Timer被cancle()
 }
 }
