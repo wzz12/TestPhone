@@ -147,6 +147,7 @@ public class LongRunningService extends Service {
 		        	e.printStackTrace();
 		        }finally{
 		        	cur.close();
+		        //	codeString=null;
 		        }
 		        
 		    	
@@ -566,7 +567,9 @@ public void setTimerTask(){
 									
 									
 									Log.i("result","验证码="+codeString);
+									codeString=null;
 									}
+									
 									break;
 									
 								}
@@ -692,9 +695,7 @@ public void setTimerTask(){
 		}
 
 		
-	}, 4000, 10000);// 表示4秒以后，每隔10秒执行一次，知道Timer被cancle()
+	}, 4000, 9000);// 表示4秒以后，每隔10秒执行一次，知道Timer被cancle()
 }
 }
 
-
-//正确的10.21上午9点半
