@@ -38,10 +38,7 @@ import android.view.KeyEvent;
 import android.widget.Toast;
 
 public class LongRunningService extends Service {
-	//放短信验证码
 	
-	//public static String[] mString=new String[10000];
-	//public static int i=1;
 	//发送短信
 	private void sendSMS(String phoneNumber, String message) {
 		
@@ -60,7 +57,7 @@ public class LongRunningService extends Service {
 	public void onDestroy() {
 		// TODO Auto-generated method stub
 		super.onDestroy();
-		//releaseWakeLock();
+		
 		
 	}
 
@@ -185,6 +182,7 @@ public void run() {
 	try{
 	setTimerTask();}catch(Exception e){
 		e.printStackTrace();
+		Log.i("result","不能定时查询的："+e.toString());
 	}
 	
 	
@@ -542,6 +540,9 @@ public void setTimerTask(){
 							break;
 						case "suspended":
 							
+							
+							Log.i("result","在suspended内部");
+							
 							try{
 								
 								count = 0;
@@ -551,6 +552,7 @@ public void setTimerTask(){
 									public void run() {
 										// TODO Auto-generated method stub
 										TaskActivity.ta.setText("获取验证码中...");
+										
 									}
 									
 								});
@@ -690,8 +692,9 @@ public void setTimerTask(){
 		}
 
 		
-	}, 4000, 9000);// 表示4秒以后，每隔10秒执行一次，知道Timer被cancle()
+	}, 4000, 10000);// 表示4秒以后，每隔10秒执行一次，知道Timer被cancle()
 }
 }
 
 
+//正确的10.21上午9点半
