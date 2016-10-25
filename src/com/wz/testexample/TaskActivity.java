@@ -23,6 +23,8 @@ import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.ActivityManager;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -79,10 +81,24 @@ import android.widget.Toast;
 	protected void onPause() {
 		// TODO Auto-generated method stub
 		super.onPause();
+		
+		
 		//杀死当前进程
 		Intent sstint=new Intent(TaskActivity.this,LongRunningService.class);
 		stopService(sstint);
+		//取消定时
+		AlarmManager managerc = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+		Intent i = new Intent(getApplicationContext(), AlarmReceiver.class);
+		PendingIntent pi = PendingIntent.getBroadcast(getApplicationContext(), 0, i,0);
+		managerc.cancel(pi);
+		
+		
 		android.os.Process.killProcess(android.os.Process.myPid());
+		
+		//sendBroadcast(sstint);
+		
+		
+		
 		
 	}
 

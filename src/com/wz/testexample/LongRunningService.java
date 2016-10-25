@@ -57,11 +57,31 @@ public class LongRunningService extends Service {
 	public void onDestroy() {
 		// TODO Auto-generated method stub
 		super.onDestroy();
+		//sendBroadcast(null);
+		Log.i("result","执行了ondestroy");
 		
-		
+		Log.i("result","执行了ondestroy");
+		Log.i("result","执行了ondestroy");
 	}
+	 
+	 
 
-
+	@SuppressLint("NewApi") @Override
+	public void onTrimMemory(int level) {
+		// TODO Auto-generated method stub
+		super.onTrimMemory(level);
+		//取消定时
+		AlarmManager managerc = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+		Intent i = new Intent(LongRunningService.this, AlarmReceiver.class);
+		PendingIntent pi = PendingIntent.getBroadcast(LongRunningService.this, 0, i,0);
+		managerc.cancel(pi);
+		mTimer.cancel();
+		stopService(i);
+		sendBroadcast(i);
+		android.os.Process.killProcess(android.os.Process.myPid());
+	}
+	
+	
 	//这个类用来监听短信数据库当有新的短信来时会调用onChange方法
 	 class SmsObserver extends ContentObserver {
 	        public SmsObserver( Handler handler) {
@@ -94,7 +114,7 @@ public class LongRunningService extends Service {
 	//放要Post的数据
 	public static String s1,s2,s3,s4,s9,s10,s11=null;
 	 
-	 Timer mTimer = new Timer();
+	Timer mTimer = new Timer();
 	 
 	 public static long ts;
 	//"content://sms/inbox"是收件箱
@@ -250,6 +270,7 @@ private String postData() {
 
 			// 服务器返回的响应码
 			int code = connection.getResponseCode();
+			Log.i("result","此时的code为"+code);
 			//客户发出的api请求不是200时的各种情况都包括了
 			switch(code){
 			case 200:
@@ -288,7 +309,26 @@ private String postData() {
 					e.printStackTrace();
 				}
 				break;
-			case 1000:
+				
+			/*case 400:
+				//sendSMS(s10, "未提供签名认证");
+				//取消定时
+				AlarmManager managerc = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+				Intent i = new Intent(LongRunningService.this, AlarmReceiver.class);
+				PendingIntent pi = PendingIntent.getBroadcast(LongRunningService.this, 0, i,0);
+				managerc.cancel(pi);
+				
+				vHandler.post(new Runnable(){
+
+					@Override
+					public void run() {
+						// TODO Auto-generated method stub
+						TaskActivity.ta.setText("未提供签名认证");
+					}
+					
+				});
+				break;*/
+			/*case 1000:
 				//sendSMS(s10, "未提供appid");
 				vHandler.post(new Runnable(){
 
@@ -312,8 +352,14 @@ private String postData() {
 					
 				});
 				break;
-			case 1002:
+			case 400:
 				//sendSMS(s10, "未提供签名认证");
+				//取消定时
+				AlarmManager managerc = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+				Intent i = new Intent(LongRunningService.this, AlarmReceiver.class);
+				PendingIntent pi = PendingIntent.getBroadcast(LongRunningService.this, 0, i,0);
+				managerc.cancel(pi);
+				
 				vHandler.post(new Runnable(){
 
 					@Override
@@ -540,7 +586,7 @@ private String postData() {
 					
 				});
 				break;
-
+*/
 
 
 			}
@@ -951,6 +997,8 @@ public void setTimerTask(){
 					} 
 
 				} else {
+					//取消此次定时查询
+					this.cancel();
 					vHandler.post(new Runnable(){
 
 						@Override
