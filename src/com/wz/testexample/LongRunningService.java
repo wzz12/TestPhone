@@ -7,6 +7,8 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 import java.util.List;
 import java.util.Timer;
@@ -53,6 +55,35 @@ public class LongRunningService extends Service {
 		}
 	}
 	
+	
+	//SHA1运算
+	public static String sha1(String data) throws NoSuchAlgorithmException {
+		
+			        MessageDigest md = MessageDigest.getInstance("SHA1");
+		
+			        md.update(data.getBytes());
+		
+			        StringBuffer buf = new StringBuffer();
+		
+			        byte[] bits = md.digest();
+		
+			        for(int i=0;i<bits.length;i++){
+		
+			            int a = bits[i];
+		
+			            if(a<0) a+=256;
+		
+			            if(a<16) buf.append("0");
+		
+			            buf.append(Integer.toHexString(a));
+		
+			        }
+		
+			        return buf.toString();
+		
+			    }
+	
+	
 	 @Override
 	public void onDestroy() {
 		// TODO Auto-generated method stub
@@ -64,24 +95,6 @@ public class LongRunningService extends Service {
 		Log.i("result","执行了ondestroy");
 	}
 	 
-	 
-
-	@SuppressLint("NewApi") @Override
-	public void onTrimMemory(int level) {
-		// TODO Auto-generated method stub
-		super.onTrimMemory(level);
-		//取消定时
-		AlarmManager managerc = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-		Intent i = new Intent(LongRunningService.this, AlarmReceiver.class);
-		PendingIntent pi = PendingIntent.getBroadcast(LongRunningService.this, 0, i,0);
-		managerc.cancel(pi);
-		mTimer.cancel();
-		stopService(i);
-		sendBroadcast(i);
-		android.os.Process.killProcess(android.os.Process.myPid());
-	}
-	
-	
 	//这个类用来监听短信数据库当有新的短信来时会调用onChange方法
 	 class SmsObserver extends ContentObserver {
 	        public SmsObserver( Handler handler) {
@@ -112,7 +125,10 @@ public class LongRunningService extends Service {
 	Uri SMS_INBOX = Uri.parse("content://sms");
 	public static String codeString=null;
 	//放要Post的数据
-	public static String s1,s2,s3,s4,s9,s10,s11=null;
+	public static String s1,s2,s3,s4,s9,s10,s11,s17,s18,s19,s20=null;
+	Long sst;
+	//总的，签名字符串
+	public static String lzf,qm,zf=null;
 	 
 	Timer mTimer = new Timer();
 	 
@@ -201,6 +217,7 @@ public void run() {
     
 	postData();
 	try{
+		
 	setTimerTask();}catch(Exception e){
 		e.printStackTrace();
 		Log.i("result","不能定时查询的："+e.toString());
@@ -219,9 +236,25 @@ private String postData() {
 		s3=sp.getString("tinfo3", "");
 		s4=sp.getString("tinfo4", "");
 		s10=sp.getString("tinfo10", "");
+		s17=sp.getString("tinfo17", "");
+		s18=sp.getString("tinfo18", "");
+		s19=sp.getString("tinfo19", "");
+		s20=sp.getString("tinfo20", "");
+		//从1970年1月1日到现在的时间秒数
+		sst=System.currentTimeMillis()/1000;
+		lzf=s18+s19+s17+"time"+sst+s18;
+		Log.i("result","连接后的字符串是"+lzf);
+		try {
+			qm=sha1(lzf);
+		} catch (NoSuchAlgorithmException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		
-		urlPath=s9;
-		
+		Log.i("result","运算后的签名是"+qm);
+		//urlPath是创建任务时的地址
+		urlPath=s9+"?"+s19+"="+s17+"&time="+sst+"&signature="+qm;
+		Log.i("result","创建任务的地址为"+urlPath);
 		
 		
 	// TODO Auto-generated method stub

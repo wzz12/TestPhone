@@ -34,7 +34,7 @@
                     android:id="@+id/tap"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="appid:" />
+                    android:text="appid" />
 
                 <EditText
                     android:id="@+id/appid"
@@ -52,7 +52,7 @@
                     android:id="@+id/tse"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="appsecret:" />
+                    android:text="appsecret" />
 
                 <EditText
                     android:id="@+id/tsap"

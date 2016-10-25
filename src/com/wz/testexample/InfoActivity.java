@@ -16,12 +16,14 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 public class InfoActivity extends Activity {
 	String phNum, phPsw, name, indeNum, eadd,
 			tb = null;
 	EditText etphnum, etphpsw, etname, etidennum, 
 			 etad, vtb ,tap,tas= null;
+	TextView tvappid,tvappsecret;
 	
 	Button bt = null;
 	public static String selectname,data = null;
@@ -40,9 +42,9 @@ public class InfoActivity extends Activity {
 		// 数据
 		data_list = new ArrayList<String>();
 		
-		data_list.add("2分钟");
+		data_list.add("8分钟");
 		
-		data_list.add("6分钟");
+		
 		data_list.add("15分钟");
 		data_list.add("20分钟");
 		data_list.add("25分钟");
@@ -150,6 +152,11 @@ public class InfoActivity extends Activity {
 				.commit();
 				userInfo.edit().putString("tinfo18", tas.getText().toString())
 				.commit();
+				//添加保存appid和appsecret的TextView的值
+				userInfo.edit().putString("tinfo19", tvappid.getText().toString())
+				.commit();
+				userInfo.edit().putString("tinfo20", tvappsecret.getText().toString())
+				.commit();
 				
 				Intent intent = new Intent(InfoActivity.this,
 						MainActivity.class);
@@ -208,6 +215,8 @@ public class InfoActivity extends Activity {
 		vtb = (EditText) findViewById(R.id.etb);
 		tap = (EditText) findViewById(R.id.appid);
 		tas = (EditText) findViewById(R.id.tsap);
+		tvappid=(TextView) findViewById(R.id.tap);
+		tvappsecret=(TextView) findViewById(R.id.tse);
 		
 
 	}

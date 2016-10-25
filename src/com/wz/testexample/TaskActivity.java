@@ -95,7 +95,7 @@ import android.widget.Toast;
 		
 		android.os.Process.killProcess(android.os.Process.myPid());
 		
-		//sendBroadcast(sstint);
+		
 		
 		
 		
