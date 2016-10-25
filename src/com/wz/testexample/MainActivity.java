@@ -1,9 +1,13 @@
 package com.wz.testexample;
 
 
+import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -17,8 +21,10 @@ public class MainActivity extends Activity {
 	public static  TextView st=null;
 	
 
-	@Override
+	@TargetApi(Build.VERSION_CODES.GINGERBREAD) @SuppressLint("NewApi") @Override
 	protected void onCreate(Bundle savedInstanceState) {
+		
+	
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
@@ -68,7 +74,7 @@ btr.setOnClickListener(new View.OnClickListener() {
 	protected void onPause() {
 		// TODO Auto-generated method stub
 		super.onPause();
-		finish();
+		//finish();
 	}
 	
 	

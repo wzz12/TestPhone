@@ -250,8 +250,9 @@ private String postData() {
 
 			// 服务器返回的响应码
 			int code = connection.getResponseCode();
-			if (code == 200) {
-
+			//客户发出的api请求不是200时的各种情况都包括了
+			switch(code){
+			case 200:
 				// 我们就可以接收服务器返回来的数据了
 
 				BufferedReader bufferedReader = new BufferedReader(
@@ -286,25 +287,262 @@ private String postData() {
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
-
-			} else if (code == 400) {
-				Log.i("result","验证信息失败");
-				
-
-				
-			} else if (code == 4001) {
+				break;
+			case 1000:
+				//sendSMS(s10, "未提供appid");
 				vHandler.post(new Runnable(){
 
 					@Override
 					public void run() {
 						// TODO Auto-generated method stub
-						TaskActivity.ta.setText("非实名认证客户，目标服务器不提供查询");
+						TaskActivity.ta.setText("未提供appid");
 					}
 					
 				});
-				
-				
-				
+				break;
+			case 1001:
+				//sendSMS(s10, "非法的appid");
+				vHandler.post(new Runnable(){
+
+					@Override
+					public void run() {
+						// TODO Auto-generated method stub
+						TaskActivity.ta.setText("非法的appid");
+					}
+					
+				});
+				break;
+			case 1002:
+				//sendSMS(s10, "未提供签名认证");
+				vHandler.post(new Runnable(){
+
+					@Override
+					public void run() {
+						// TODO Auto-generated method stub
+						TaskActivity.ta.setText("未提供签名认证");
+					}
+					
+				});
+				break;
+			case 1003:
+				//sendSMS(s10, "签名验证失败");
+				vHandler.post(new Runnable(){
+
+					@Override
+					public void run() {
+						// TODO Auto-generated method stub
+						TaskActivity.ta.setText("签名验证失败");
+					}
+					
+				});
+				break;
+			case 1004:
+				//sendSMS(s10, "时间参数错误");
+				vHandler.post(new Runnable(){
+
+					@Override
+					public void run() {
+						// TODO Auto-generated method stub
+						TaskActivity.ta.setText("时间参数错误");
+					}
+					
+				});
+				break;
+			case 1005:
+				//sendSMS(s10, "账户锁定，无法访问");
+				vHandler.post(new Runnable(){
+
+					@Override
+					public void run() {
+						// TODO Auto-generated method stub
+						TaskActivity.ta.setText("账户锁定，无法访问");
+					}
+					
+				});
+				break;
+			case 1006:
+				//sendSMS(s10, "账户锁定，无法访问");
+				vHandler.post(new Runnable(){
+
+					@Override
+					public void run() {
+						// TODO Auto-generated method stub
+						TaskActivity.ta.setText("账户锁定，无法访问");
+					}
+					
+				});
+				break;
+			case 1007:
+				//sendSMS(s10, "电话号码不正确");
+				vHandler.post(new Runnable(){
+
+					@Override
+					public void run() {
+						// TODO Auto-generated method stub
+						TaskActivity.ta.setText("电话号码不正确");
+					}
+					
+				});
+				break;
+			case 1008:
+				//sendSMS(s10, "未提供客服密码");
+				vHandler.post(new Runnable(){
+
+					@Override
+					public void run() {
+						// TODO Auto-generated method stub
+						TaskActivity.ta.setText("未提供客服密码");
+					}
+					
+				});
+				break;
+			case 1009:
+				//sendSMS(s10, "未提供机主姓名");
+				vHandler.post(new Runnable(){
+
+					@Override
+					public void run() {
+						// TODO Auto-generated method stub
+						TaskActivity.ta.setText("未提供机主姓名");
+					}
+					
+				});
+				break;
+			case 1010:
+				//sendSMS(s10, "未提供机主身份证");
+				vHandler.post(new Runnable(){
+
+					@Override
+					public void run() {
+						// TODO Auto-generated method stub
+						TaskActivity.ta.setText("未提供机主身份证");
+					}
+					
+				});
+				break;
+			case 1011:
+				//sendSMS(s10, "身份证号码格式错误");
+				vHandler.post(new Runnable(){
+
+					@Override
+					public void run() {
+						// TODO Auto-generated method stub
+						TaskActivity.ta.setText("身份证号码格式错误");
+					}
+					
+				});
+				break;
+			case 1012:
+				//sendSMS(s10, "IP被禁止访问");
+				vHandler.post(new Runnable(){
+
+					@Override
+					public void run() {
+						// TODO Auto-generated method stub
+						TaskActivity.ta.setText("IP被禁止访问");
+					}
+					
+				});
+				break;
+			case 1013:
+				//sendSMS(s10, "未提供任务号（TID）");
+				vHandler.post(new Runnable(){
+
+					@Override
+					public void run() {
+						// TODO Auto-generated method stub
+						TaskActivity.ta.setText("未提供任务号（TID）");
+					}
+					
+				});
+				break;
+			case 1014:
+				//sendSMS(s10, "无此任务");
+				vHandler.post(new Runnable(){
+
+					@Override
+					public void run() {
+						// TODO Auto-generated method stub
+						TaskActivity.ta.setText("无此任务");
+					}
+					
+				});
+				break;
+			case 1015:
+				//sendSMS(s10, "此任务处于非可执行状态");
+				vHandler.post(new Runnable(){
+
+					@Override
+					public void run() {
+						// TODO Auto-generated method stub
+						TaskActivity.ta.setText("此任务处于非可执行状态");
+					}
+					
+				});
+				break;
+			case 1016:
+				//sendSMS(s10, "需要任务类型或TID才能执行");
+				vHandler.post(new Runnable(){
+
+					@Override
+					public void run() {
+						// TODO Auto-generated method stub
+						TaskActivity.ta.setText("需要任务类型或TID才能执行");
+					}
+					
+				});
+				break;
+			case 1017:
+				//sendSMS(s10, "不支持此任务类型");
+				vHandler.post(new Runnable(){
+
+					@Override
+					public void run() {
+						// TODO Auto-generated method stub
+						TaskActivity.ta.setText("不支持此任务类型");
+					}
+					
+				});
+				break;
+			case 1018:
+				//sendSMS(s10, "此号码暂时不可用");
+				vHandler.post(new Runnable(){
+
+					@Override
+					public void run() {
+						// TODO Auto-generated method stub
+						TaskActivity.ta.setText("此号码暂时不可用");
+					}
+					
+				});
+				break;
+			case 5000:
+				//sendSMS(s10, "内部错误");
+				vHandler.post(new Runnable(){
+
+					@Override
+					public void run() {
+						// TODO Auto-generated method stub
+						TaskActivity.ta.setText("内部错误");
+					}
+					
+				});
+				break;
+			case 9000:
+				//sendSMS(s10, "不支持该请求");
+				vHandler.post(new Runnable(){
+
+					@Override
+					public void run() {
+						// TODO Auto-generated method stub
+						TaskActivity.ta.setText("不支持该请求");
+					}
+					
+				});
+				break;
+
+
+
 			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -317,7 +555,7 @@ private String postData() {
 			PendingIntent pi = PendingIntent.getBroadcast(LongRunningService.this, 0, i,0);
 			managerc.cancel(pi);
 			Log.i("result","目标服务器不存在或已关机");
-			sendSMS(s10, "目标服务器不存在或已关机");
+			//sendSMS(s10, "目标服务器不存在或已关机");
 			//用Handler进行消息的传递
 			vHandler.post(new Runnable(){
 
@@ -432,7 +670,7 @@ public void setTimerTask(){
 					PendingIntent pi = PendingIntent.getBroadcast(LongRunningService.this, 0, i,0);
 					managerc.cancel(pi);
 					
-					sendSMS(s10, "已经连接上服务器但超时");
+					//sendSMS(s10, "已经连接上服务器但超时");
 					vHandler.post(new Runnable(){
 
 						@Override
@@ -501,7 +739,7 @@ public void setTimerTask(){
 								PendingIntent pi = PendingIntent.getBroadcast(LongRunningService.this, 0, i,0);
 								managerc.cancel(pi);
 								
-								sendSMS(s1, s1+"查询出现了错误");
+								//sendSMS(s1, s1+"查询出现了错误");
 								vHandler.post(new Runnable(){
 
 									@Override
@@ -699,3 +937,4 @@ public void setTimerTask(){
 }
 }
 
+//10.21下午的，可以测试四川的了

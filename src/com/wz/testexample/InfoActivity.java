@@ -42,7 +42,7 @@ public class InfoActivity extends Activity {
 		
 		data_list.add("3分钟");
 		
-		data_list.add("12分钟");
+		data_list.add("6分钟");
 		data_list.add("15分钟");
 		data_list.add("20分钟");
 		data_list.add("25分钟");

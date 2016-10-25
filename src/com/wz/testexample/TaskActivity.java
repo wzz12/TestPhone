@@ -39,43 +39,35 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-@SuppressLint("NewApi") public class TaskActivity extends Activity{
+@SuppressLint("NewApi") public class TaskActivity extends Activity {
 	public static TextView ta;
 	 
 	 private PowerManager.WakeLock wakeLock; 
-	/* private void acquireWakeLock() {
-         if (wakeLock ==null) {
-                Log.i("result","Acquiring wake lock");
-                PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
-                wakeLock = pm.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, this.getClass().getCanonicalName());
-                wakeLock.acquire();
-            }
-        
-    }*/
-		/*private void releaseWakeLock() {
-	        if (wakeLock !=null&& wakeLock.isHeld()) {
-	            wakeLock.release();
-	            wakeLock =null;
-	        }
-
-	    }*/
+	
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+		
+		
+		
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.task);
 		ta=(TextView) findViewById(R.id.ta);
+		//启动服务
 		
-		//acquireWakeLock();
 		Intent intent = new Intent(this, LongRunningService.class);
 		startService(intent);
+		
+		
 	}
 	//这里写测试用的程序
 	
@@ -84,8 +76,23 @@ import android.widget.Toast;
 	protected void onDestroy() {
 		// TODO Auto-generated method stub
 		super.onDestroy();
-		//releaseWakeLock();
+		//android.os.Process.killProcess(android.os.Process.myPid());
 	}
+
+//当离开当前页面时调用
+	@Override
+	protected void onPause() {
+		// TODO Auto-generated method stub
+		super.onPause();
+		//杀死当前进程
+		Intent sstint=new Intent(TaskActivity.this,LongRunningService.class);
+		stopService(sstint);
+		android.os.Process.killProcess(android.os.Process.myPid());
+		
+	}
+
+
+	
 	 
 	 
 	
