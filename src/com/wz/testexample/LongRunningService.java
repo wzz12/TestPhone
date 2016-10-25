@@ -730,6 +730,141 @@ public void setTimerTask(){
 							// 如果任务失败，就要重新创建任务查询3到5次看是哪的原因
 							Log.i("result", "失败");
 							count++;
+							//当查询错误时的各种错误提示
+							switch(getCodeString){
+							case 2000:
+								vHandler.post(new Runnable(){
+
+									@Override
+									public void run() {
+										// TODO Auto-generated method stub
+										TaskActivity.ta.setText("账号暂时锁定，请稍后再试");
+									}
+									
+								});
+								break;
+							case 2001:
+								vHandler.post(new Runnable(){
+
+									@Override
+									public void run() {
+										// TODO Auto-generated method stub
+										TaskActivity.ta.setText("号码是空号");
+									}
+									
+								});
+								break;
+							case 3000:
+								vHandler.post(new Runnable(){
+
+									@Override
+									public void run() {
+										// TODO Auto-generated method stub
+										TaskActivity.ta.setText("目标服务器发送短信随机码失败");
+									}
+									
+								});
+								break;
+							case 3001:
+								vHandler.post(new Runnable(){
+
+									@Override
+									public void run() {
+										// TODO Auto-generated method stub
+										TaskActivity.ta.setText("短信随机码发送太多，请稍后再试");
+									}
+									
+								});
+								break;
+							case 3002:
+								vHandler.post(new Runnable(){
+
+									@Override
+									public void run() {
+										// TODO Auto-generated method stub
+										TaskActivity.ta.setText("短信随机码验证失败");
+									}
+									
+								});
+								break;
+							case 4000:
+								vHandler.post(new Runnable(){
+
+									@Override
+									public void run() {
+										// TODO Auto-generated method stub
+										TaskActivity.ta.setText("验证用户信息失败");
+									}
+									
+								});
+								break;
+							case 4001:
+								vHandler.post(new Runnable(){
+
+									@Override
+									public void run() {
+										// TODO Auto-generated method stub
+										TaskActivity.ta.setText("非实名认证用户，目标服务器不提供查询");
+									}
+									
+								});
+								break;
+							case 5000:
+								vHandler.post(new Runnable(){
+
+									@Override
+									public void run() {
+										// TODO Auto-generated method stub
+										TaskActivity.ta.setText("目标服务器网络超时");
+									}
+									
+								});
+								break;
+							case 5001:
+								vHandler.post(new Runnable(){
+
+									@Override
+									public void run() {
+										// TODO Auto-generated method stub
+										TaskActivity.ta.setText("目标服务器网络错误");
+									}
+									
+								});
+								break;
+							case 6000:
+								vHandler.post(new Runnable(){
+
+									@Override
+									public void run() {
+										// TODO Auto-generated method stub
+										TaskActivity.ta.setText("目标服务器繁忙");
+									}
+									
+								});
+								break;
+							case 6001:
+								vHandler.post(new Runnable(){
+
+									@Override
+									public void run() {
+										// TODO Auto-generated method stub
+										TaskActivity.ta.setText("目标服务器错误");
+									}
+									
+								});
+								break;
+							case 9999:
+								vHandler.post(new Runnable(){
+
+									@Override
+									public void run() {
+										// TODO Auto-generated method stub
+										TaskActivity.ta.setText("未知错误");
+									}
+									
+								});
+								break;
+							}
 							if (count == 5) {
 
 								mTimer.cancel();
@@ -740,20 +875,7 @@ public void setTimerTask(){
 								managerc.cancel(pi);
 								
 								//sendSMS(s1, s1+"查询出现了错误");
-								vHandler.post(new Runnable(){
-
-									@Override
-									public void run() {
-										// TODO Auto-generated method stub
-										TaskActivity.ta.setText("查询失败");
-									}
-									
-								});
 								
-								
-								
-								
-								break;
 							} else {
 
 								break;
@@ -937,4 +1059,3 @@ public void setTimerTask(){
 }
 }
 
-//10.21下午的，可以测试四川的了

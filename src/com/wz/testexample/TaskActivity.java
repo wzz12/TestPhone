@@ -72,12 +72,7 @@ import android.widget.Toast;
 	//这里写测试用的程序
 	
 
-	@Override
-	protected void onDestroy() {
-		// TODO Auto-generated method stub
-		super.onDestroy();
-		//android.os.Process.killProcess(android.os.Process.myPid());
-	}
+	
 
 //当离开当前页面时调用
 	@Override
