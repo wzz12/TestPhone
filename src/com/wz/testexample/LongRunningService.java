@@ -117,11 +117,12 @@ public class LongRunningService extends Service {
 	Uri SMS_INBOX = Uri.parse("content://sms");
 	public static String codeString=null;
 	public String result = "";
+	public String getPath;
 	//放要Post的数据
 	public static String s1,s2,s3,s4,s9,s10,s11,s17,s18,s19,s20=null;
-	Long sst;
+	Long sst,sstf;
 	//总的，签名字符串
-	public static String lzf,qm=null;
+	public static String lzf,qm,cqm,clzf=null;
 	 public int code;
 	 public HttpURLConnection connection;
 	Timer mTimer = new Timer();
@@ -383,7 +384,7 @@ private String postData() {
 			Log.i("result","到了异常394"+e.toString());
 			//e.printStackTrace();
 			
-			/*Log.i("result","323行异常出现原因"+e.getMessage());
+			Log.i("result","323行异常出现原因"+e.getMessage());
 			mTimer.cancel();
 			//取消定时
 			AlarmManager managerc = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
@@ -398,60 +399,11 @@ private String postData() {
 				@Override
 				public void run() {
 					// TODO Auto-generated method stub
-					TaskActivity.ta.setText("查询出现错误，目标服务器不存在或已关机");
+					TaskActivity.ta.setText("目标服务器不存在或已关机");
 				}
 				
-			});*/
-			/*if(code==400){
-				Log.i("result","在400里面");
-				try {
-					sbufferedReader = new BufferedReader(
-							new InputStreamReader(
-									connection.getInputStream()));
-				} catch (IOException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-				Log.i("result","当为400时");
-
-				String sreadlineString = null;
-				try {
-					while ((sreadlineString = sbufferedReader.readLine()) != null) {
-						result += sreadlineString;
-					}
-				} catch (IOException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-				try {
-					sbufferedReader.close();
-				} catch (IOException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-
-				connection.disconnect();
-				Log.i("result","此时的错误日志"+result);
-				
-				
-				
-				//取消定时
-				AlarmManager managerc = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-				Intent i = new Intent(LongRunningService.this, AlarmReceiver.class);
-				PendingIntent pi = PendingIntent.getBroadcast(LongRunningService.this, 0, i,0);
-				managerc.cancel(pi);
-				
-				vHandler.post(new Runnable(){
-
-					@Override
-					public void run() {
-						// TODO Auto-generated method stub
-						TaskActivity.ta.setText("未提供签名认证");
-					}
-					
-				});
-				
-			}*/
+			});
+			
 			
 			
 			
@@ -535,12 +487,30 @@ public void setTimerTask(){
 
 		@Override
 		public void run() {
-			String getPath = urlPath + "&tid=" + tid;
+			sstf=System.currentTimeMillis()/1000;
+			
+			
+			clzf=s18+s19+s17+"tid"+tid+"time"+sst+s18;
+			
+			Log.i("result","545行的clzf为"+clzf);
+			try {
+				cqm=sha1(clzf);
+				//getPath=s9+"?"+s19+"="+s17+"&time="+sst+"&signature="+cqm+"&tid="+tid;
+				getPath=s9+"?"+"tid="+tid+"&"+s19+"="+s17+"&time="+sst+"&signature="+cqm;
+				
+				Log.i("result","定时查询的地址为"+getPath);
+			} catch (NoSuchAlgorithmException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 			JSONObject jObject = null;
+			Log.i("result","执行到540");
+			Log.i("result","此时的地址为"+getPath);
 			
-			
+			Log.i("result","执行到543");
 			
 			try {
+				Log.i("result","执行到546");
 				URL sUrl = new URL(getPath);
 				// 打开网络连接
 				HttpURLConnection conn = (HttpURLConnection) sUrl
@@ -615,143 +585,31 @@ public void setTimerTask(){
 							count = 0;
 							break;
 						case "failed":
-							// 如果任务失败，就要重新创建任务查询3到5次看是哪的原因
+							// 如果任务失败，就要重新创建任务查询3到5次看是哪的原因，有的可能是目标服务器网络错误
 							Log.i("result", "失败");
 							count++;
-							//当查询错误时的各种错误提示
-							switch(getCodeString){
-							case 2000:
+							Log.i("result","失败的结果显示为"+getResult);
+							  /*Pattern pattern = Pattern.compile("[A-Za-z0-9]{6}");
+				               
+				                
+				                //我获取的验证码是4位阿拉伯数字，正则匹配规则您可能需要修改
+				                Matcher matcher = pattern.matcher(body);*/
+							//提取全部中文
+							Pattern cpattern = Pattern.compile("[\u4E00-\u9FA5]+");
+							 final Matcher cmatcher = cpattern.matcher(getResult);
+							if(cmatcher.find()){
 								vHandler.post(new Runnable(){
 
 									@Override
 									public void run() {
+										String sty=cmatcher.group();
 										// TODO Auto-generated method stub
-										TaskActivity.ta.setText("账号暂时锁定，请稍后再试");
+										TaskActivity.ta.setText(sty);
+										Log.i("result","失败原因 ："+sty);
+										
 									}
 									
 								});
-								break;
-							case 2001:
-								vHandler.post(new Runnable(){
-
-									@Override
-									public void run() {
-										// TODO Auto-generated method stub
-										TaskActivity.ta.setText("号码是空号");
-									}
-									
-								});
-								break;
-							case 3000:
-								vHandler.post(new Runnable(){
-
-									@Override
-									public void run() {
-										// TODO Auto-generated method stub
-										TaskActivity.ta.setText("目标服务器发送短信随机码失败");
-									}
-									
-								});
-								break;
-							case 3001:
-								vHandler.post(new Runnable(){
-
-									@Override
-									public void run() {
-										// TODO Auto-generated method stub
-										TaskActivity.ta.setText("短信随机码发送太多，请稍后再试");
-									}
-									
-								});
-								break;
-							case 3002:
-								vHandler.post(new Runnable(){
-
-									@Override
-									public void run() {
-										// TODO Auto-generated method stub
-										TaskActivity.ta.setText("短信随机码验证失败");
-									}
-									
-								});
-								break;
-							case 4000:
-								vHandler.post(new Runnable(){
-
-									@Override
-									public void run() {
-										// TODO Auto-generated method stub
-										TaskActivity.ta.setText("验证用户信息失败");
-									}
-									
-								});
-								break;
-							case 4001:
-								vHandler.post(new Runnable(){
-
-									@Override
-									public void run() {
-										// TODO Auto-generated method stub
-										TaskActivity.ta.setText("非实名认证用户，目标服务器不提供查询");
-									}
-									
-								});
-								break;
-							case 5000:
-								vHandler.post(new Runnable(){
-
-									@Override
-									public void run() {
-										// TODO Auto-generated method stub
-										TaskActivity.ta.setText("目标服务器网络超时");
-									}
-									
-								});
-								break;
-							case 5001:
-								vHandler.post(new Runnable(){
-
-									@Override
-									public void run() {
-										// TODO Auto-generated method stub
-										TaskActivity.ta.setText("目标服务器网络错误");
-									}
-									
-								});
-								break;
-							case 6000:
-								vHandler.post(new Runnable(){
-
-									@Override
-									public void run() {
-										// TODO Auto-generated method stub
-										TaskActivity.ta.setText("目标服务器繁忙");
-									}
-									
-								});
-								break;
-							case 6001:
-								vHandler.post(new Runnable(){
-
-									@Override
-									public void run() {
-										// TODO Auto-generated method stub
-										TaskActivity.ta.setText("目标服务器错误");
-									}
-									
-								});
-								break;
-							case 9999:
-								vHandler.post(new Runnable(){
-
-									@Override
-									public void run() {
-										// TODO Auto-generated method stub
-										TaskActivity.ta.setText("未知错误");
-									}
-									
-								});
-								break;
 							}
 							if (count == 5) {
 
@@ -763,7 +621,8 @@ public void setTimerTask(){
 								managerc.cancel(pi);
 								
 								//sendSMS(s1, s1+"查询出现了错误");
-								
+
+								break;
 							} else {
 
 								break;
@@ -839,20 +698,47 @@ public void setTimerTask(){
 					} 
 
 				} else {
+					//这个是定时查询的签名认证失败时
 					//取消此次定时查询
-					this.cancel();
-					vHandler.post(new Runnable(){
-
-						@Override
-						public void run() {
-							// TODO Auto-generated method stub
-							//TaskActivity.ta.setText("请求有错");
-							Log.i("result","请求有错");
-						}
+					Log.i("result","到了定时查询的400这里");
+					try{
+						mTimer.cancel();
+						//取消定时
+						AlarmManager managerc = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+						Intent i = new Intent(LongRunningService.this, AlarmReceiver.class);
+						PendingIntent pi = PendingIntent.getBroadcast(LongRunningService.this, 0, i,0);
+						managerc.cancel(pi);
 						
-					});
+						BufferedReader cssbufferedReader = new BufferedReader(
+								new InputStreamReader(
+										conn.getErrorStream()));
+
+						String cssreadlineString = null;
+						while ((cssreadlineString = cssbufferedReader.readLine()) != null) {
+							getResult += cssreadlineString;
+						}
+						Log.i("result","打印出此时的日志"+getResult);
+						
+						cssbufferedReader.close();
+						
+						conn.disconnect();
+						
+						vHandler.post(new Runnable(){
+
+							@Override
+							public void run() {
+								// TODO Auto-generated method stub
+								TaskActivity.ta.setText(getResult);
+							}
+							
+						});
 					
-					this.cancel();
+					
+					
+					}catch(Exception e){
+						Log.i("result","错误原因350"+e.toString());
+					}
+					
 				}
 
 			} catch (MalformedURLException e) {
