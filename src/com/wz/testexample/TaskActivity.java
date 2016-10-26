@@ -76,12 +76,15 @@ import android.widget.Toast;
 
 	
 
-//当离开当前页面时调用
+
+	
+
+
+//调用返回键
 	@Override
-	protected void onPause() {
+	public void onBackPressed() {
 		// TODO Auto-generated method stub
-		super.onPause();
-		
+		super.onBackPressed();
 		
 		//杀死当前进程
 		Intent sstint=new Intent(TaskActivity.this,LongRunningService.class);
@@ -95,16 +98,11 @@ import android.widget.Toast;
 		
 		android.os.Process.killProcess(android.os.Process.myPid());
 		
-		
-		
-		
-		
-		
 	}
 
 
-	
-	 
+
+
 	 
 	
 	}
