@@ -86,6 +86,7 @@ public class LongRunningService extends Service {
 	
 	
 	
+	
 	 
 	//这个类用来监听短信数据库当有新的短信来时会调用onChange方法
 	 class SmsObserver extends ContentObserver {
@@ -105,9 +106,26 @@ public class LongRunningService extends Service {
 	            
 	        }
 	    }
+	 
+	 
+	 
+	 
+	 
+	 
+	 
+	 @Override
+	public void onDestroy() {
+		// TODO Auto-generated method stub
+		super.onDestroy();
+		
+		
+	}
+
+
+	
 	
 	URL url;
-	String tid = "";
+ String tid = "";
 	String getResult = "";
 	String statusString = "";
 	int count = 0;
@@ -116,15 +134,17 @@ public class LongRunningService extends Service {
 	public static String  urlPath=null;
 	Uri SMS_INBOX = Uri.parse("content://sms");
 	public static String codeString=null;
-	public String result = "";
+	
+	public String fresu="";
 	public String getPath;
+	private PowerManager.WakeLock wakeLock;
 	//放要Post的数据
 	public static String s1,s2,s3,s4,s9,s10,s11,s17,s18,s19,s20=null;
 	Long sst,sstf;
 	//总的，签名字符串
 	public static String lzf,qm,cqm,clzf=null;
-	 public int code;
-	 public HttpURLConnection connection;
+	
+	
 	Timer mTimer = new Timer();
 	
 	 public static long ts;
@@ -205,7 +225,7 @@ public int onStartCommand(Intent intent, int flags, int startId) {
 new Thread(new Runnable() {
 @Override
 public void run() {
-	//acquireWakeLock();
+	
 	 smsObserver = new SmsObserver(smsHandler);
      getContentResolver().registerContentObserver(SMS_INBOX, true,
              smsObserver);
@@ -223,7 +243,7 @@ public void run() {
 }
 
 private String postData() {
-	
+	 
 	 SharedPreferences sp=getSharedPreferences("user_info", MODE_PRIVATE);
 		s9=sp.getString("tinfo9", "");
 		s1=sp.getString("tinfo1", "");
@@ -236,10 +256,14 @@ private String postData() {
 		s18=sp.getString("tinfo18", "");
 		s19=sp.getString("tinfo19", "");
 		s20=sp.getString("tinfo20", "");
+		
+		String result="";
+		
 		//从1970年1月1日到现在的时间秒数
 		sst=System.currentTimeMillis()/1000;
 		lzf=s18+s19+s17+"time"+sst+s18;
 		Log.i("result","连接后的字符串是"+lzf);
+		
 		try {
 			qm=sha1(lzf);
 		} catch (NoSuchAlgorithmException e1) {
@@ -265,10 +289,10 @@ private String postData() {
 		cliKey.put("password", s2);
 		cliKey.put("userName", s3);
 		cliKey.put("userID", s4);
-
+Log.i("result","已经post好数据了");
 		String contentString = String.valueOf(cliKey);
 		try {
-			 connection = (HttpURLConnection) url
+			HttpURLConnection connection = (HttpURLConnection) url
 					.openConnection();
 			// 设置连接网络超时为2秒
 			connection.setConnectTimeout(2000);
@@ -294,8 +318,8 @@ private String postData() {
 			osOutputStream.close();
 
 			// 服务器返回的响应码
-			 code = connection.getResponseCode();
-			Log.i("result","此时的code为"+code);
+			int  code = connection.getResponseCode();
+			Log.i("result","此时的postData的code为"+code);
 			//客户发出的api请求不是200时的各种情况都包括了
 			if(code==200){
 				// 我们就可以接收服务器返回来的数据了
@@ -334,7 +358,7 @@ private String postData() {
 				}
 			}
 			else {
-				Log.i("result","到了400这里");
+				Log.i("result","到了postData的400这里");
 				try{
 					mTimer.cancel();
 					//取消定时
@@ -352,6 +376,7 @@ private String postData() {
 						result += ssreadlineString;
 					}
 					Log.i("result","打印出此时的日志"+result);
+					fresu=result;
 					
 					ssbufferedReader.close();
 					
@@ -362,7 +387,7 @@ private String postData() {
 						@Override
 						public void run() {
 							// TODO Auto-generated method stub
-							TaskActivity.ta.setText(result);
+							TaskActivity.ta.setText(fresu);
 						}
 						
 					});
@@ -370,7 +395,7 @@ private String postData() {
 				
 				
 				}catch(Exception e){
-					Log.i("result","错误原因350"+e.toString());
+					Log.i("result","错误原因410"+e.toString());
 				}
 				
 				
@@ -411,18 +436,18 @@ private String postData() {
 	} catch (MalformedURLException e) {
 		// TODO Auto-generated catch block
 		e.printStackTrace();
-		Log.i("result","到了457");
+		Log.i("result","到了451");
 	} catch (JSONException e) {
 		// TODO Auto-generated catch block
 		e.printStackTrace();
-		Log.i("result","到了461");
+		Log.i("result","到了455");
 	}
 
 	return result;
 }
 }).start();
  AlarmManager manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-
+ 
 //int anHour = 60 * 60 * 1000; // 这是一小时的毫秒数
 SharedPreferences sp=getSharedPreferences("user_info", MODE_PRIVATE);
 LongRunningService.s11=sp.getString("tinfo11", "");
@@ -487,31 +512,33 @@ public void setTimerTask(){
 
 		@Override
 		public void run() {
+			
 			sstf=System.currentTimeMillis()/1000;
 			
 			
 			clzf=s18+s19+s17+"tid"+tid+"time"+sst+s18;
+			Log.i("result","此时的时间为"+sst);
 			
-			Log.i("result","545行的clzf为"+clzf);
 			try {
 				cqm=sha1(clzf);
-				//getPath=s9+"?"+s19+"="+s17+"&time="+sst+"&signature="+cqm+"&tid="+tid;
+				
 				getPath=s9+"?"+"tid="+tid+"&"+s19+"="+s17+"&time="+sst+"&signature="+cqm;
 				
-				Log.i("result","定时查询的地址为"+getPath);
+				
 			} catch (NoSuchAlgorithmException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 			JSONObject jObject = null;
 			Log.i("result","执行到540");
-			Log.i("result","此时的地址为"+getPath);
+			
 			
 			Log.i("result","执行到543");
 			
 			try {
 				Log.i("result","执行到546");
 				URL sUrl = new URL(getPath);
+				Log.i("result","定时查询的地址为"+getPath);
 				// 打开网络连接
 				HttpURLConnection conn = (HttpURLConnection) sUrl
 						.openConnection();
@@ -541,7 +568,7 @@ public void setTimerTask(){
 					
 					
 					}
-				Log.i("result","执行到451行");
+				Log.i("result","执行到581行");
 				// 读取数据之前获取当前服务器返回的响应码
 				int getCodeString = conn.getResponseCode();
 				if (getCodeString == 200) {
@@ -564,9 +591,10 @@ public void setTimerTask(){
 					if(BuildConfig.DEBUG){
 					Log.i("testlog", getResult);}
 					try {
-						Log.i("result","执行到475行");
+						Log.i("result","执行到604行");
 						jObject = new JSONObject(getResult);
 						statusString = jObject.getString("status");
+						Log.i("result","查询出的状态为"+statusString);
 						switch (statusString) {
 						
 						case "processing":
@@ -589,11 +617,7 @@ public void setTimerTask(){
 							Log.i("result", "失败");
 							count++;
 							Log.i("result","失败的结果显示为"+getResult);
-							  /*Pattern pattern = Pattern.compile("[A-Za-z0-9]{6}");
-				               
-				                
-				                //我获取的验证码是4位阿拉伯数字，正则匹配规则您可能需要修改
-				                Matcher matcher = pattern.matcher(body);*/
+							  
 							//提取全部中文
 							Pattern cpattern = Pattern.compile("[\u4E00-\u9FA5]+");
 							 final Matcher cmatcher = cpattern.matcher(getResult);
@@ -716,6 +740,7 @@ public void setTimerTask(){
 						String cssreadlineString = null;
 						while ((cssreadlineString = cssbufferedReader.readLine()) != null) {
 							getResult += cssreadlineString;
+							Log.i("result","755行的错误信息"+getResult);
 						}
 						Log.i("result","打印出此时的日志"+getResult);
 						
