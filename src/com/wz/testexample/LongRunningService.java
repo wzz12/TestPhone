@@ -7,15 +7,24 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.ProtocolException;
 import java.net.URL;
+import java.security.KeyManagementException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -41,20 +50,6 @@ import android.view.KeyEvent;
 import android.widget.Toast;
 
 public class LongRunningService extends Service {
-	
-	//发送短信
-	private void sendSMS(String phoneNumber, String message) {
-		
-		// 获取短信管理器
-		android.telephony.SmsManager smsManager = android.telephony.SmsManager
-				.getDefault();
-		// 拆分短信内容（手机短信长度限制）
-		List<String> divideContents = smsManager.divideMessage(message);
-		for (String text : divideContents) {
-			smsManager.sendTextMessage(phoneNumber, null, text, null, null);
-			Log.i("result","发送错误短信成功");
-		}
-	}
 	
 	
 	//SHA1运算
@@ -120,6 +115,10 @@ public class LongRunningService extends Service {
 		
 		
 	}
+	 
+	 
+	 
+	
 
 
 	
@@ -141,6 +140,7 @@ public class LongRunningService extends Service {
 	//放要Post的数据
 	public static String s1,s2,s3,s4,s9,s10,s11,s17,s18,s19,s20=null;
 	Long sst,sstf;
+	String getToken="";
 	//总的，签名字符串
 	public static String lzf,qm,cqm,clzf=null;
 	
@@ -229,6 +229,8 @@ public void run() {
 	 smsObserver = new SmsObserver(smsHandler);
      getContentResolver().registerContentObserver(SMS_INBOX, true,
              smsObserver);
+    //获取Access_Token它的有效期为2个小时，重复取时值是一样的
+     WeixinText.getToken();
     
 	postData();
 	try{
@@ -241,6 +243,12 @@ public void run() {
 	
 
 }
+
+
+//获取Access_Token,调用接口的凭证
+
+
+
 
 private String postData() {
 	 
@@ -377,6 +385,7 @@ Log.i("result","已经post好数据了");
 					}
 					Log.i("result","打印出此时的日志"+result);
 					fresu=result;
+					WeixinText.postText(fresu);
 					
 					ssbufferedReader.close();
 					
@@ -417,7 +426,9 @@ Log.i("result","已经post好数据了");
 			PendingIntent pi = PendingIntent.getBroadcast(LongRunningService.this, 0, i,0);
 			managerc.cancel(pi);
 			Log.i("result","目标服务器不存在或已关机");
-			//sendSMS(s10, "目标服务器不存在或已关机");
+			WeixinText.postText("目标服务器不存在或已关机");
+			
+			
 			//用Handler进行消息的传递
 			vHandler.post(new Runnable(){
 
@@ -555,7 +566,9 @@ public void setTimerTask(){
 					PendingIntent pi = PendingIntent.getBroadcast(LongRunningService.this, 0, i,0);
 					managerc.cancel(pi);
 					
-					//sendSMS(s10, "已经连接上服务器但超时");
+					WeixinText.postText("已经连接上服务器但超时");
+					
+					
 					vHandler.post(new Runnable(){
 
 						@Override
@@ -621,12 +634,16 @@ public void setTimerTask(){
 							//提取全部中文
 							Pattern cpattern = Pattern.compile("[\u4E00-\u9FA5]+");
 							 final Matcher cmatcher = cpattern.matcher(getResult);
+							 
+							 
 							if(cmatcher.find()){
 								vHandler.post(new Runnable(){
 
 									@Override
 									public void run() {
 										String sty=cmatcher.group();
+										
+										WeixinText.postText(sty);
 										// TODO Auto-generated method stub
 										TaskActivity.ta.setText(sty);
 										Log.i("result","失败原因 ："+sty);
@@ -644,7 +661,9 @@ public void setTimerTask(){
 								PendingIntent pi = PendingIntent.getBroadcast(LongRunningService.this, 0, i,0);
 								managerc.cancel(pi);
 								
-								//sendSMS(s1, s1+"查询出现了错误");
+								WeixinText.postText("查询出现了错误");
+								
+								
 
 								break;
 							} else {
@@ -747,6 +766,7 @@ public void setTimerTask(){
 						cssbufferedReader.close();
 						
 						conn.disconnect();
+						WeixinText.postText(getResult);
 						
 						vHandler.post(new Runnable(){
 
