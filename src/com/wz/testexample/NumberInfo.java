@@ -83,7 +83,7 @@ public class NumberInfo extends Activity{
 		 Log.i("result","此时的nurl为"+nurl);
 		
 		
-		String phn="";
+		
 		String getnum="";
 		try {
 			SSLContext nsslcontext = SSLContext.getInstance("TLS");
@@ -114,7 +114,7 @@ public class NumberInfo extends Activity{
 					StringBuffer nsBf = new StringBuffer();
 					String nline = null;
 					 
-					//phn=new String(nbuffer,"GBK");
+					
 					// 读取服务器返回的信息
 					while ((nline = nbuffer.readLine()) != null) {
 						nsBf.append(nline);
@@ -143,6 +143,7 @@ public class NumberInfo extends Activity{
 					
 					
 		        }
+		        
 			
 			
 		} catch (NoSuchAlgorithmException e) {
