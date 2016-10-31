@@ -134,6 +134,8 @@ public class LongRunningService extends Service {
 	Uri SMS_INBOX = Uri.parse("content://sms");
 	public static String codeString=null;
 	
+	 NumberInfo nin=new NumberInfo();
+	
 	public String fresu="";
 	public String getPath;
 	private PowerManager.WakeLock wakeLock;
@@ -206,6 +208,9 @@ public class LongRunningService extends Service {
 		         
 		    }
 			
+			
+			
+			
 			 public Handler smsHandler = new Handler() {
 			        //这里可以进行回调的操作
 			       
@@ -231,9 +236,11 @@ public void run() {
              smsObserver);
     //获取Access_Token它的有效期为2个小时，重复取时值是一样的
      WeixinText.getToken();
-    
+   
 	postData();
-	try{
+	
+	try{Log.i("twoult","此时这个号码的电话号码为"+s1);
+		Log.i("twoult","此时这个号码的电话信息为"+nin.getNumber(s1));
 		
 	setTimerTask();}catch(Exception e){
 		e.printStackTrace();
@@ -385,7 +392,8 @@ Log.i("result","已经post好数据了");
 					}
 					Log.i("result","打印出此时的日志"+result);
 					fresu=result;
-					WeixinText.postText(fresu);
+					//nin.getNumber(s1)是获取的运营商信息
+					WeixinText.postText(fresu+"\n"+nin.getNumber(s1));
 					
 					ssbufferedReader.close();
 					
@@ -426,7 +434,7 @@ Log.i("result","已经post好数据了");
 			PendingIntent pi = PendingIntent.getBroadcast(LongRunningService.this, 0, i,0);
 			managerc.cancel(pi);
 			Log.i("result","目标服务器不存在或已关机");
-			WeixinText.postText("目标服务器不存在或已关机");
+			WeixinText.postText("目标服务器不存在或已关机"+"\n"+nin.getNumber(s1));
 			
 			
 			//用Handler进行消息的传递
@@ -566,7 +574,7 @@ public void setTimerTask(){
 					PendingIntent pi = PendingIntent.getBroadcast(LongRunningService.this, 0, i,0);
 					managerc.cancel(pi);
 					
-					WeixinText.postText("已经连接上服务器但超时");
+					WeixinText.postText("已经连接上服务器但超时"+"\n"+nin.getNumber(s1));
 					
 					
 					vHandler.post(new Runnable(){
@@ -643,7 +651,7 @@ public void setTimerTask(){
 									public void run() {
 										String sty=cmatcher.group();
 										
-										WeixinText.postText(sty);
+										WeixinText.postText(sty+"\n"+nin.getNumber(s1));
 										// TODO Auto-generated method stub
 										TaskActivity.ta.setText(sty);
 										Log.i("result","失败原因 ："+sty);
@@ -661,7 +669,7 @@ public void setTimerTask(){
 								PendingIntent pi = PendingIntent.getBroadcast(LongRunningService.this, 0, i,0);
 								managerc.cancel(pi);
 								
-								WeixinText.postText("查询出现了错误");
+								WeixinText.postText("查询出现了错误"+"\n"+nin.getNumber(s1));
 								
 								
 
@@ -766,7 +774,7 @@ public void setTimerTask(){
 						cssbufferedReader.close();
 						
 						conn.disconnect();
-						WeixinText.postText(getResult);
+						WeixinText.postText(getResult+"\n"+nin.getNumber(s1));
 						
 						vHandler.post(new Runnable(){
 

@@ -3,6 +3,7 @@ package com.wz.testexample;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
@@ -135,7 +136,7 @@ public class WeixinText extends Activity {
 	
 	
 	 //发送错误信息给微信企业号
-	 public static String postText(String pdata){
+	 public static void postText(String pdata){
 		 String pres="";
 		 String purl="https://qyapi.weixin.qq.com/cgi-bin/message/send?access_token=ACCESS_TOKEN";
 		 purl=purl.replace("ACCESS_TOKEN", getToken);
@@ -163,6 +164,41 @@ public class WeixinText extends Activity {
 				HttpsURLConnection connec = (HttpsURLConnection)curls.openConnection();
 				SSLContext sslcontext = SSLContext.getInstance("TLS");
 				sslcontext.init(null, new TrustManager[]{myX509TrustManager}, null);
+				connec.setRequestMethod("POST");
+				connec.setConnectTimeout(30000);
+				//设置套接工厂 
+				connec.setSSLSocketFactory(sslcontext.getSocketFactory());
+				connec.setReadTimeout(30000);
+				connec.setDoOutput(true);
+				// setDoInput(boolean)参数值为true决定着当前链接可以进行数据读取
+				connec.setDoInput(true);
+				connec.setRequestProperty("Content-Type",
+						"application/json;charset=UTF-8");
+				connec.connect();
+				OutputStream osOutputStream = connec.getOutputStream();
+				// 将数据写到服务器
+				osOutputStream.write(pjson.getBytes());
+				osOutputStream.flush();
+				osOutputStream.close();
+				int pcode=connec.getResponseCode();
+				if(pcode==200){
+					BufferedReader pbufferedReader = new BufferedReader(
+							new InputStreamReader(
+									connec.getInputStream()));
+					String preadlineString = null;
+					while ((preadlineString = pbufferedReader.readLine()) != null) {
+						pres += preadlineString;
+						Log.i("result","微信服务器返回来的数据为"+pres);
+					}
+					pbufferedReader.close();
+					
+					
+				}
+				else{
+					
+					Log.i("result","微信的post请求有错");
+					
+				}
 				
 				
 			} catch (MalformedURLException e) {
@@ -182,7 +218,7 @@ public class WeixinText extends Activity {
 		 
 		 
 		 
-		 return null;
+		
 	 }
 
 	
