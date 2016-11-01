@@ -116,7 +116,12 @@ public class LongRunningService extends Service {
  String tid = "";
 	String getResult = "";
 	String statusString = "";
+	//记录失败的
 	int count = 0;
+	//ff是记录fresu错误时，即包含此号码暂时不可用错误时,mb是记录目标服务器不存在或已关机的
+	int ff,mb,mc,rq=0;
+	//记录成功的
+	int succ=1;
 	Handler vHandler=new Handler();
 	SmsObserver smsObserver;
 	public static String  urlPath=null;
@@ -298,7 +303,7 @@ long t1;
 
 
 Intent i = new Intent(this, AlarmReceiver.class);
-//i.setAction("repeating");
+
 //pi代表闹钟需要执行的动作
 PendingIntent pi = PendingIntent.getBroadcast(this, 0, i,0);
 //4.4以上才有setExact方法按照准确的时间
@@ -430,12 +435,11 @@ Log.i("result","已经post好数据了");
 			else {
 				Log.i("result","到了postData的400这里");
 				try{
+					succ=0;
+					ff++;
 					mTimer.cancel();
 					//取消定时
-					AlarmManager managerc = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-					Intent i = new Intent(LongRunningService.this, AlarmReceiver.class);
-					PendingIntent pi = PendingIntent.getBroadcast(LongRunningService.this, 0, i,0);
-					managerc.cancel(pi);
+					cancleAlarm();
 					
 					BufferedReader ssbufferedReader = new BufferedReader(
 							new InputStreamReader(
@@ -445,10 +449,30 @@ Log.i("result","已经post好数据了");
 					while ((ssreadlineString = ssbufferedReader.readLine()) != null) {
 						result += ssreadlineString;
 					}
+					//此号码暂时不可用
 					Log.i("result","打印出此时的日志"+result);
 					fresu=result;
-					//nin.getNumber(s1)是获取的运营商信息
-					//WeixinText.postText(fresu+"\n"+nin.getNumber(s1));
+					if(ff==1){
+						
+						//WeixinText.postText("第一次："+fresu+"\n"+nin.getNumber(s1));
+						Log.i("twolog","第一次："+fresu);
+						
+					}
+					else if(ff!=1&&ff!=3){
+						//大于3次以后就继续查而不报警了
+						
+						//Log.i("twolog",ff+"次："+fresu);
+						
+					}
+					else if(ff==3){
+						//nin.getNumber(s1)是获取的运营商信息
+						//WeixinText.postText("第三次："+fresu+"\n"+nin.getNumber(s1));
+						Log.i("twolog","第三次："+fresu);
+						
+					}
+					
+					Log.i("twolog","已经判断好ff的值为"+ff);
+					startAlarm();
 					
 					ssbufferedReader.close();
 					
@@ -477,6 +501,8 @@ Log.i("result","已经post好数据了");
 
 			
 		} catch (IOException e) {
+			succ=0;
+			mb++;
 			// TODO Auto-generated catch block
 			Log.i("result","到了异常394"+e.toString());
 			//e.printStackTrace();
@@ -484,10 +510,7 @@ Log.i("result","已经post好数据了");
 			Log.i("result","323行异常出现原因"+e.getMessage());
 			mTimer.cancel();
 			//取消定时
-			AlarmManager managerc = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-			Intent i = new Intent(LongRunningService.this, AlarmReceiver.class);
-			PendingIntent pi = PendingIntent.getBroadcast(LongRunningService.this, 0, i,0);
-			managerc.cancel(pi);
+			cancleAlarm();
 			Log.i("result","目标服务器不存在或已关机");
 			//WeixinText.postText("目标服务器不存在或已关机"+"\n"+nin.getNumber(s1));
 			
@@ -503,6 +526,26 @@ Log.i("result","已经post好数据了");
 				
 			});
 			
+			if(mb==1){
+				
+				//WeixinText.postText("第一次："+"目标服务器不存在或已关机"+"\n"+nin.getNumber(s1));
+				Log.i("twolog","第一次："+"目标服务器不存在或已关机");
+				
+			}
+			else if(mb!=1&&mb!=3){
+				//大于3次以后就继续查而不报警了
+				
+				//Log.i("twolog",mb+"次："+"目标服务器不存在或已关机");
+				
+			}
+			else if(mb==3){
+				//nin.getNumber(s1)是获取的运营商信息
+				//WeixinText.postText("第三次："+"目标服务器不存在或已关机"+"\n"+nin.getNumber(s1));
+				Log.i("twolog","第三次："+"目标服务器不存在或已关机");
+				
+			}
+			//重新启动这个service
+			startAlarm();
 			
 			
 			
@@ -556,20 +599,20 @@ public void setTimerTask(){
 				URL sUrl = new URL(getPath);
 				Log.i("result","定时查询的地址为"+getPath);
 				// 打开网络连接
-				HttpURLConnection conn = (HttpURLConnection) sUrl
+					HttpURLConnection conn = (HttpURLConnection) sUrl
 						.openConnection();
-				conn.setConnectTimeout(30000);
-				try{
+				
+						
+					conn.setConnectTimeout(30000);
+					try{
 					Log.i("result","能执行这一句"+conn.getResponseCode());
 				}catch(Exception e){
+					succ=0;
 					//这个是已经连接上服务器，但服务器繁忙，导致网络连接超时
-				
+				mc++;
 					mTimer.cancel();
 					//取消定时
-					AlarmManager managerc = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-					Intent i = new Intent(LongRunningService.this, AlarmReceiver.class);
-					PendingIntent pi = PendingIntent.getBroadcast(LongRunningService.this, 0, i,0);
-					managerc.cancel(pi);
+					cancleAlarm();
 					
 					//WeixinText.postText("已经连接上服务器但超时"+"\n"+nin.getNumber(s1));
 					
@@ -584,6 +627,30 @@ public void setTimerTask(){
 						}
 						
 					});
+					
+					if(mc==1){
+						
+						//WeixinText.postText("第一次："+"已经连接上服务器但超时"+"\n"+nin.getNumber(s1));
+						Log.i("twolog","第一次："+"已经连接上服务器但超时");
+						
+					}
+					else if(mc!=1&&mc!=3){
+						//大于3次以后就继续查而不报警了
+						
+						//Log.i("twolog",mb+"次："+"已经连接上服务器但超时");
+						
+					}
+					else if(mc==3){
+						//nin.getNumber(s1)是获取的运营商信息
+						//WeixinText.postText("第三次："+"已经连接上服务器但超时"+"\n"+nin.getNumber(s1));
+						Log.i("twolog","第三次："+"已经连接上服务器但超时");
+						
+					}
+					//重新启动这个service
+					startAlarm();
+					
+					
+					
 					
 					
 					}
@@ -632,6 +699,8 @@ public void setTimerTask(){
 							
 							break;
 						case "failed":
+							//一旦失败succ就置为0
+							succ=0;
 							// 如果任务失败，就要重新创建任务查询3到5次看是哪的原因，有的可能是目标服务器网络错误
 							Log.i("result", "失败");
 						count++;
@@ -640,10 +709,7 @@ public void setTimerTask(){
 							this.cancel();
 							//postData();
 							//取消定时
-							AlarmManager managerc = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-							Intent i = new Intent(LongRunningService.this, AlarmReceiver.class);
-							PendingIntent pi = PendingIntent.getBroadcast(LongRunningService.this, 0, i,0);
-							managerc.cancel(pi);
+							cancleAlarm();
 							
 							Log.i("result","失败的结果显示为"+getResult);
 							//提取全部中文
@@ -705,6 +771,23 @@ public void setTimerTask(){
 						
 
 						case "done":
+							//一旦成功ff就置为0
+							ff=0;
+							mb=0;
+							mc=0;
+							rq=0;
+							//一旦失败succ置为0，初始succ=1,所以succ等于0时，在状态为success的里面时，就是刚从不正常到正常
+							
+							
+							if(succ==0){
+								//一旦成功，就将succ置为1，它的初值
+								succ++;
+								//一旦成功将count置为0，为下一次失败做准备
+								count=0;
+								//WeixinText.postText("恢复正常,查询成功了"+\n"+nin.getNumber(s1));
+								Log.i("twolog","恢复正常,查询成功了");
+								
+							}
 							if(BuildConfig.DEBUG){
 							Log.i("result", "成功");}
 							
@@ -758,16 +841,31 @@ public void setTimerTask(){
 							Pattern spattern = Pattern.compile("[\u4E00-\u9FA5].+");
 							 final Matcher smatcher = spattern.matcher(getResult);
 							 if(smatcher.find()){
-								 //密码错误时提示
+								 //密码错误时提示，也有下发短信验证码的提示，因为它提取的是汉字
 									vHandler.post(new Runnable(){
 
 										@Override
 										public void run() {
 											String ssty=smatcher.group();
-											Log.i("twoult",ssty);
-										//	WeixinText.postText(sty+"\n"+nin.getNumber(s1));
+											Log.i("twolog","ssty的值"+ssty);
+											//若没有密码这两个字则返回-1
+											if(ssty.indexOf("密码")==-1){
+												TaskActivity.ta.setText(ssty);
+											}
+											else{
+												
+												mTimer.cancel();
+												cancleAlarm();
+												//ssty含有密码两个字,就是指密码输错
+											//WeixinText.postText(ssty+"\n"+nin.getNumber(s1));
+												Log.i("twolog","密码错误时"+ssty);
+												TaskActivity.ta.setText(ssty);
+												
+											}
+											
+										
 											// TODO Auto-generated method stub
-											TaskActivity.ta.setText(ssty);
+											
 											
 											
 										}
@@ -809,12 +907,11 @@ public void setTimerTask(){
 					//取消此次定时查询
 					Log.i("result","到了定时查询的400这里");
 					try{
+						succ=0;
+						rq++;
 						mTimer.cancel();
 						//取消定时
-						AlarmManager managerc = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-						Intent i = new Intent(LongRunningService.this, AlarmReceiver.class);
-						PendingIntent pi = PendingIntent.getBroadcast(LongRunningService.this, 0, i,0);
-						managerc.cancel(pi);
+						cancleAlarm();
 						
 						BufferedReader cssbufferedReader = new BufferedReader(
 								new InputStreamReader(
@@ -841,6 +938,31 @@ public void setTimerTask(){
 							}
 							
 						});
+						
+						if(rq==1){
+							
+							//WeixinText.postText("第一次："+getResult+"\n"+nin.getNumber(s1));
+							Log.i("twolog","第一次："+getResult);
+							
+						}
+						else if(rq!=1&&rq!=3){
+							//大于3次以后就继续查而不报警了
+							
+							//Log.i("twolog",rq+"次："+getResult);
+							
+						}
+						else if(rq==3){
+							//nin.getNumber(s1)是获取的运营商信息
+							//WeixinText.postText("第三次："+getResult+"\n"+nin.getNumber(s1));
+							Log.i("twolog","第三次："+getResult);
+							
+						}
+						
+						startAlarm();
+						
+						
+						
+						
 					
 					
 					
@@ -943,21 +1065,28 @@ public void setTimerTask(){
 	}, 4000, 9000);// 表示4秒以后，每隔10秒执行一次，知道Timer被cancle()
 }
 
-
+//启动AlarmReceiver,进而可以重新启动这个service
 public void startAlarm(){
 	Log.i("twoult","失败之后又执行了这句");
-	/*//这几句是启动AlarmReceiver
-	AlarmManager smanager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-	Intent si = new Intent(this, AlarmReceiver.class);
-	long striggerAtTime =SystemClock.elapsedRealtime()+LongRunningService.ts ;
-	PendingIntent spi = PendingIntent.getBroadcast(this, 0, si,0);
-	smanager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, striggerAtTime, spi);
-	Log.i("twoult","重新启动service完毕");*/
+	
 	
 	Intent si = new Intent("android.intent.action.ALARMRECEIVER" );
 	 sendBroadcast(si);  
 	 Log.i("twoult","重新启动service完毕");
 
+	
+}
+
+
+//取消定时的方法
+public void cancleAlarm(){
+	
+	
+	//取消定时
+	AlarmManager managerc = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+	Intent i = new Intent(LongRunningService.this, AlarmReceiver.class);
+	PendingIntent pi = PendingIntent.getBroadcast(LongRunningService.this, 0, i,0);
+	managerc.cancel(pi);
 	
 }
 
