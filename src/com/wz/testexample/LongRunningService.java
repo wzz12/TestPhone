@@ -244,218 +244,12 @@ public void run() {
 }
 
 
-//获取Access_Token,调用接口的凭证
 
 
 
 
-/*private String postData() {
-	 
-	 SharedPreferences sp=getSharedPreferences("user_info", MODE_PRIVATE);
-		s9=sp.getString("tinfo9", "");
-		s1=sp.getString("tinfo1", "");
-		s2=sp.getString("tinfo2", "");
-		s3=sp.getString("tinfo3", "");
-		s4=sp.getString("tinfo4", "");
-		s10=sp.getString("tinfo10", "");
-		//s17,s18是appid和appsecret的内容，s19和s20是他们的TextView
-		s17=sp.getString("tinfo17", "");
-		s18=sp.getString("tinfo18", "");
-		s19=sp.getString("tinfo19", "");
-		s20=sp.getString("tinfo20", "");
-		
-		String result="";
-		
-		//从1970年1月1日到现在的时间秒数
-		sst=System.currentTimeMillis()/1000;
-		lzf=s18+s19+s17+"time"+sst+s18;
-		Log.i("result","连接后的字符串是"+lzf);
-		
-		try {
-			qm=sha1(lzf);
-		} catch (NoSuchAlgorithmException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		
-		Log.i("result","运算后的签名是"+qm);
-		//urlPath是创建任务时的地址
-		urlPath=s9+"?"+s19+"="+s17+"&time="+sst+"&signature="+qm;
-		Log.i("result","创建任务的地址为"+urlPath);
-	
-	
-	try {
-		url = new URL(urlPath);
-		
-		JSONObject cliKey = new JSONObject();
-		// 封装Json数据,就是POST要提交的内容，参数直接写在url里
-		cliKey.put("type", "mobile");
-		cliKey.put("phoneNo",s1 );
-		
-		
-		cliKey.put("password", s2);
-		cliKey.put("userName", s3);
-		cliKey.put("userID", s4);
-Log.i("result","已经post好数据了");
-		String contentString = String.valueOf(cliKey);
-		try {
-			HttpURLConnection connection = (HttpURLConnection) url
-					.openConnection();
-			// 设置连接网络超时为2秒
-			connection.setConnectTimeout(2000);
-			// 设置允许输出到服务器
-			// setDoOutput(boolean)参数值为true时决定着当前链接可以进行数据提交工作
-			connection.setDoOutput(true);
-			
-			// setDoInput(boolean)参数值为true决定着当前链接可以进行数据读取
-			connection.setDoInput(true);
-			connection.setRequestMethod("POST");
-			// 内容提交码
-			connection.setRequestProperty("Content-Type",
-					"application/json;charset=UTF-8");
-			connection.connect();
-			// connection.getOutputStream()获取数据流从而进行数据写操作，为将数据提交到服务器作准备
-			OutputStream osOutputStream = connection.getOutputStream();
-			// 将数据写到服务器
-			osOutputStream.write(contentString.getBytes());
-			
-			osOutputStream.flush();
-			// 执行完osOutputStream.close()之后，POST请求结束
 
-			osOutputStream.close();
 
-			// 服务器返回的响应码
-			int  code = connection.getResponseCode();
-			Log.i("result","此时的postData的code为"+code);
-			//客户发出的api请求不是200时的各种情况都包括了
-			if(code==200){
-				// 我们就可以接收服务器返回来的数据了
-
-				BufferedReader bufferedReader = new BufferedReader(
-						new InputStreamReader(
-								connection.getInputStream()));
-
-				String readlineString = null;
-				while ((readlineString = bufferedReader.readLine()) != null) {
-					result += readlineString;
-				}
-				bufferedReader.close();
-
-				connection.disconnect();
-				if(BuildConfig.DEBUG){
-
-				Log.i("testlog", result);
-
-				Log.i("testlog", "数据传递成功");}
-				// 从json字符串里取出某个数据
-
-				JSONObject jsonObject = null;
-				try {
-					jsonObject = new JSONObject(result);
-					tid = jsonObject.getString("tid");
-					// 打印它的tid
-					
-					String status = jsonObject.getString("status");
-					if(BuildConfig.DEBUG){
-					Log.i("testlog", "tid=" + tid);
-					// 打印此时的状态
-					Log.i("testlog", "status=" + status);}
-				} catch (JSONException e) {
-					e.printStackTrace();
-				}
-			}
-			else {
-				Log.i("result","到了postData的400这里");
-				try{
-					mTimer.cancel();
-					//取消定时
-					AlarmManager managerc = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-					Intent i = new Intent(LongRunningService.this, AlarmReceiver.class);
-					PendingIntent pi = PendingIntent.getBroadcast(LongRunningService.this, 0, i,0);
-					managerc.cancel(pi);
-					
-					BufferedReader ssbufferedReader = new BufferedReader(
-							new InputStreamReader(
-									connection.getErrorStream()));
-
-					String ssreadlineString = null;
-					while ((ssreadlineString = ssbufferedReader.readLine()) != null) {
-						result += ssreadlineString;
-					}
-					Log.i("result","打印出此时的日志"+result);
-					fresu=result;
-					//nin.getNumber(s1)是获取的运营商信息
-					//WeixinText.postText(fresu+"\n"+nin.getNumber(s1));
-					
-					ssbufferedReader.close();
-					
-					connection.disconnect();
-					
-					vHandler.post(new Runnable(){
-
-						@Override
-						public void run() {
-							// TODO Auto-generated method stub
-							TaskActivity.ta.setText(fresu);
-						}
-						
-					});
-				
-				
-				
-				}catch(Exception e){
-					Log.i("result","错误原因410"+e.toString());
-				}
-				
-				
-			}
-				
-			
-
-			
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			Log.i("result","到了异常394"+e.toString());
-			//e.printStackTrace();
-			
-			Log.i("result","323行异常出现原因"+e.getMessage());
-			mTimer.cancel();
-			//取消定时
-			AlarmManager managerc = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-			Intent i = new Intent(LongRunningService.this, AlarmReceiver.class);
-			PendingIntent pi = PendingIntent.getBroadcast(LongRunningService.this, 0, i,0);
-			managerc.cancel(pi);
-			Log.i("result","目标服务器不存在或已关机");
-			//WeixinText.postText("目标服务器不存在或已关机"+"\n"+nin.getNumber(s1));
-			
-			
-			//用Handler进行消息的传递
-			vHandler.post(new Runnable(){
-
-				@Override
-				public void run() {
-					// TODO Auto-generated method stub
-					TaskActivity.ta.setText("目标服务器不存在或已关机");
-				}
-				
-			});
-			
-			
-			
-			
-		}
-	} catch (MalformedURLException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-		Log.i("result","到了451");
-	} catch (JSONException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-		Log.i("result","到了455");
-	}
-
-	return result;
-}*/
 }).start();
  AlarmManager manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
  
@@ -835,15 +629,23 @@ public void setTimerTask(){
 							});
 							
 
-							count = 0;
+							
 							break;
 						case "failed":
 							// 如果任务失败，就要重新创建任务查询3到5次看是哪的原因，有的可能是目标服务器网络错误
 							Log.i("result", "失败");
-							count++;
+						count++;
+						Log.i("twolog","此时的count的值"+count);
+							//失败了之后，只是这个任务取消，Timer并没有取消
+							this.cancel();
+							//postData();
+							//取消定时
+							AlarmManager managerc = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+							Intent i = new Intent(LongRunningService.this, AlarmReceiver.class);
+							PendingIntent pi = PendingIntent.getBroadcast(LongRunningService.this, 0, i,0);
+							managerc.cancel(pi);
+							
 							Log.i("result","失败的结果显示为"+getResult);
-							  
-							///^([\u4e00-\u9fa5]{1,},){0,}([\u4e00-\u9fa5]{1,})$/;
 							//提取全部中文
 							//Pattern cpattern = Pattern.compile("[\u4E00-\u9FA5]+");
 							//小数点可以匹配除换行符号以外的任何符号
@@ -854,6 +656,7 @@ public void setTimerTask(){
 							 
 							if(cmatcher.find()){
 								vHandler.post(new Runnable(){
+									//空号的时候会失败
 
 									@Override
 									public void run() {
@@ -868,30 +671,43 @@ public void setTimerTask(){
 									
 								});
 							}
-							if (count == 5) {
-
-								mTimer.cancel();
-								//postData();
-								//取消定时
-								AlarmManager managerc = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-								Intent i = new Intent(LongRunningService.this, AlarmReceiver.class);
-								PendingIntent pi = PendingIntent.getBroadcast(LongRunningService.this, 0, i,0);
-								managerc.cancel(pi);
+							
+							
+							if(count==1){
+								Log.i("twolog","此时count的值应该为1实际是："+count);
+								//WeixinText.postText(sty+"\n"+"第一次失败"+\n"+nin.getNumber(s1));
+								Log.i("twolog","第一次失败报警成功");
+								//报警成功后还有继续查询
+								startAlarm();
 								
-							//	WeixinText.postText("查询出现了错误"+"\n"+nin.getNumber(s1));
-								
-								
-
-								break;
-							} else {
-
-								break;
 							}
+							else if(count!=1&&count!=3){
+								Log.i("twolog","此时count的值，在这个条件里不希望count的值为1或3实际是："+count);
+							Log.i("twolog","开始调用startAlarm");
+							startAlarm();
+							Log.i("twolog","调用startAlarm结束");
+							}
+							else if(count==3) {
+								//连续失败了3次报警，报警成功后再继续查
+								Log.i("twolog","此时count的值应该为3实际是："+count);
+								//WeixinText.postText(sty+"\n"+"已经连续失败3次"+\n"+nin.getNumber(s1));
+								Log.i("twolog","报警成功");
+								//报警成功后还有继续查询
+								startAlarm();
+								
+							}
+							
+							
+							 
+							  
+							
+							break;
+						
 
 						case "done":
 							if(BuildConfig.DEBUG){
 							Log.i("result", "成功");}
-							count = 0;
+							
 							vHandler.post(new Runnable(){
 
 								@Override
@@ -907,7 +723,35 @@ public void setTimerTask(){
 							
 							break;
 						case "suspended":
+							try{
 							
+							while(codeString!=null){
+								
+								
+								vHandler.post(new Runnable(){
+
+									@Override
+									public void run() {
+										// TODO Auto-generated method stub
+										TaskActivity.ta.setText("获取验证码中...");
+										
+									}
+									
+								});
+								
+								Log.i("result","到了while内部");
+								flushPostSmsCode();
+								if(BuildConfig.DEBUG){
+								Log.i("result","已发送好个短信");
+								
+								
+								Log.i("result","验证码="+codeString);
+								codeString=null;
+								}
+								
+								break;
+								
+							}
 							
 							Log.i("result","在suspended内部");
 							//提取全部中文
@@ -934,38 +778,13 @@ public void setTimerTask(){
 								}
 							 
 							
-							 else{
-								 Log.i("result","就是getResult不含汉字");
+							 
 							
-							try{
+							
 								
-								count = 0;
-								vHandler.post(new Runnable(){
-
-									@Override
-									public void run() {
-										// TODO Auto-generated method stub
-										TaskActivity.ta.setText("获取验证码中...");
-										
-									}
-									
-								});
 								
-								while(codeString!=null){
-									
-									Log.i("result","到了while内部");
-									flushPostSmsCode();
-									if(BuildConfig.DEBUG){
-									Log.i("result","已发送好个短信");
-									
-									
-									Log.i("result","验证码="+codeString);
-									codeString=null;
-									}
-									
-									break;
-									
-								}
+								
+								
 								
 								
 								
@@ -974,11 +793,11 @@ public void setTimerTask(){
 								Log.i("twoult","异常"+e.toString()+"580hang");
 							}
 							
-						}
+						
 							
 							
 
-						}
+						}//switch的后一个花括号
 					} catch (JSONException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -1123,4 +942,23 @@ public void setTimerTask(){
 		
 	}, 4000, 9000);// 表示4秒以后，每隔10秒执行一次，知道Timer被cancle()
 }
+
+
+public void startAlarm(){
+	Log.i("twoult","失败之后又执行了这句");
+	/*//这几句是启动AlarmReceiver
+	AlarmManager smanager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+	Intent si = new Intent(this, AlarmReceiver.class);
+	long striggerAtTime =SystemClock.elapsedRealtime()+LongRunningService.ts ;
+	PendingIntent spi = PendingIntent.getBroadcast(this, 0, si,0);
+	smanager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, striggerAtTime, spi);
+	Log.i("twoult","重新启动service完毕");*/
+	
+	Intent si = new Intent("android.intent.action.ALARMRECEIVER" );
+	 sendBroadcast(si);  
+	 Log.i("twoult","重新启动service完毕");
+
+	
+}
+
 }

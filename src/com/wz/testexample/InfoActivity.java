@@ -43,7 +43,7 @@ public class InfoActivity extends Activity {
 		data_list = new ArrayList<String>();
 		
 		data_list.add("5分钟");
-		
+		data_list.add("10分钟");
 		
 		data_list.add("15分钟");
 		data_list.add("20分钟");

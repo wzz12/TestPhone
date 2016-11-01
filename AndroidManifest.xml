@@ -65,6 +65,12 @@
 <!-- 在AlarmManager应用中，如果设定定时器的进程被终止，定时器Broadcast就发不出来，BroadcastReceiver也就启动不了。因此设置BroadcastReceiver的process属性为启动新进程还是很有必要的 -->
 <receiver android:name=".AlarmReceiver"
       >
+            
+    <intent-filter>
+                <action android:name="android.intent.action.ALARMRECEIVER" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
 </receiver>
         
     </application>
