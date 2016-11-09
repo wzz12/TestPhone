@@ -22,7 +22,7 @@ public class InfoActivity extends Activity {
 	String phNum, phPsw, name, indeNum, eadd,
 			tb = null;
 	EditText etphnum, etphpsw, etname, etidennum, 
-			 etad, vtb ,tap,tas= null;
+			 etad ,tap,tas= null;
 	TextView tvappid,tvappsecret;
 	
 	Button bt = null;
@@ -117,7 +117,7 @@ public class InfoActivity extends Activity {
 				indeNum = etidennum.getText().toString();
 				
 				eadd = etad.getText().toString();
-				tb = vtb.getText().toString();
+				
 				// TODO Auto-generated method stub
 
 				// SharedPreferences用来保存EditText输入框中输入的信息
@@ -132,7 +132,7 @@ public class InfoActivity extends Activity {
 						.putString("tinfo2", etphpsw.getText().toString())
 						.commit();
 
-				Log.i("result", etphnum.getText().toString());
+				
 				userInfo.edit()
 						.putString("tinfo3", etname.getText().toString())
 						.commit();
@@ -142,8 +142,7 @@ public class InfoActivity extends Activity {
 				
 				userInfo.edit().putString("tinfo9", etad.getText().toString())
 						.commit();
-				userInfo.edit().putString("tinfo10", vtb.getText().toString())
-						.commit();
+				
 				//存选中的时间
 				userInfo.edit().putString("tinfo11", data).commit();
 				
@@ -192,7 +191,7 @@ public class InfoActivity extends Activity {
 		etidennum.setText(info4);
 		
 		etad.setText(info9);
-		vtb.setText(info10);
+		
 		tap.setText(info17);
 		tas.setText(info18);
 		//当界面跳转后能更新已保存的Spinner的选项
@@ -212,7 +211,7 @@ public class InfoActivity extends Activity {
 		etidennum = (EditText) findViewById(R.id.etid);
 		
 		etad = (EditText) findViewById(R.id.etadd);
-		vtb = (EditText) findViewById(R.id.etb);
+		
 		tap = (EditText) findViewById(R.id.appid);
 		tas = (EditText) findViewById(R.id.tsap);
 		tvappid=(TextView) findViewById(R.id.tap);
@@ -227,6 +226,19 @@ public class InfoActivity extends Activity {
 		super.onPause();
 		finish();
 	}
+
+	@Override
+	public void onBackPressed() {
+		// TODO Auto-generated method stub
+		super.onBackPressed();
+		
+		Intent ii=new Intent(InfoActivity.this,MainActivity.class);
+		startActivity(ii);
+		overridePendingTransition(android.R.anim.fade_in,android.R.anim.fade_out);
+		
+	}
+	
+	
 	
 
 }

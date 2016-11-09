@@ -18,7 +18,6 @@ import java.util.regex.Pattern;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -51,8 +50,12 @@ import android.widget.Toast;
 
 @SuppressLint("NewApi") public class TaskActivity extends Activity {
 	public static TextView ta;
-	 
-	 private PowerManager.WakeLock wakeLock; 
+	//记录失败的
+	 public static int count=0;
+	 //记录成功的
+	 public static int succ=1;
+	//ff是记录fresu错误时，和非法的签名id和secret即包含此号码暂时不可用错误时,mb是记录目标服务器不存在或已关机的
+	public static  int ff,mb,mc,rq=0;
 	
 
 	@Override
@@ -86,7 +89,10 @@ import android.widget.Toast;
 	public void onBackPressed() {
 		// TODO Auto-generated method stub
 		super.onBackPressed();
-		
+		Intent mi=new Intent(TaskActivity.this,MainActivity.class);
+		startActivity(mi);
+		//overridePendingTransition()的两个参数是进入动画和出去的动画
+		overridePendingTransition(android.R.anim.fade_in,android.R.anim.fade_out);
 		//杀死当前进程
 		Intent sstint=new Intent(TaskActivity.this,LongRunningService.class);
 		stopService(sstint);

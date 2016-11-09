@@ -19,7 +19,7 @@ public class MainActivity extends Activity {
 	Button bts=null;
 	Button btr=null;
 	public static  TextView st=null;
-	//Long ss;
+	
 
 	@TargetApi(Build.VERSION_CODES.GINGERBREAD) @SuppressLint("NewApi") @Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -31,8 +31,7 @@ public class MainActivity extends Activity {
 		bts = (Button) findViewById(R.id.bts);
 		btr = (Button) findViewById(R.id.btr);
 		st=(TextView) findViewById(R.id.s);
-		/*ss=System.currentTimeMillis()/1000;
-		Log.i("result","现在的时间是"+ss);*/
+		
 		// 设置按钮的点击事件
 		bts.setOnClickListener(new View.OnClickListener() {
 
@@ -59,7 +58,7 @@ btr.setOnClickListener(new View.OnClickListener() {
 				
 				startActivity(tin);
 				//杀死了这个页面
-				//finish();
+				
 				
 			
 				
@@ -75,7 +74,7 @@ btr.setOnClickListener(new View.OnClickListener() {
 	protected void onPause() {
 		// TODO Auto-generated method stub
 		super.onPause();
-		//finish();
+		finish();
 	}
 	
 	

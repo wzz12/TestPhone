@@ -80,7 +80,7 @@ public class NumberInfo extends Activity{
 	public  String getNumber(String num){
 		
 		String nurl="https://tcc.taobao.com/cc/json/mobile_tel_segment.htm?tel="+num;
-		 Log.i("result","此时的nurl为"+nurl);
+		
 		
 		
 		
@@ -134,7 +134,7 @@ public class NumberInfo extends Activity{
 					 root = objectMapper.readTree(jsonS);
 					
 					
-						Log.i("twoult","返回来的数据"+root.path("areaVid").asText() + root.path("carrier").asText());
+						
 					
 					 
 					
@@ -163,7 +163,7 @@ public class NumberInfo extends Activity{
 		
 		
 		
-		Log.i("result","返回来的数据     " +root.path("carrier").asText()+" "+root.path("telString").asText());
+		//Log.i("result","返回来的数据     " +root.path("carrier").asText()+" "+root.path("telString").asText());
 		//root.path("catName").asText() + root.path("carrier").asText()
 		return root.path("carrier").asText()+" "+root.path("telString").asText();
 		

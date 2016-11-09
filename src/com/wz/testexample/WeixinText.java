@@ -89,15 +89,15 @@ public class WeixinText extends Activity {
 				while ((gline = gbuffer.readLine()) != null) {
 					gsBf.append(gline);
 					getul=gsBf.toString();
-					Log.i("result","此时的Access_Token和有效期"+getul);
+					
 
 				}
 				
-				Log.i("result","此时的Access_Token和有效期"+getul);
+				
 				try {
 					JSONObject gjson=new JSONObject(getul);
 					getToken=gjson.getString("access_token");
-					Log.i("result","取得的access_token为"+getToken);
+					
 					
 					
 				} catch (JSONException e) {
@@ -140,8 +140,8 @@ public class WeixinText extends Activity {
 		 String pres="";
 		 String purl="https://qyapi.weixin.qq.com/cgi-bin/message/send?access_token=ACCESS_TOKEN";
 		 purl=purl.replace("ACCESS_TOKEN", getToken);
-		 Log.i("result","getToken的值为"+getToken);
-			Log.i("result","此时post的地址为"+purl);
+		 
+			
 			StringBuffer psb = new StringBuffer();
 			psb.append("{");
 			psb.append("\"touser\":" + "\"" + "@all" + "\",");
@@ -158,7 +158,7 @@ public class WeixinText extends Activity {
 	       
 			psb.append("}");
 	        String pjson = psb.toString();
-	        Log.i("result","pjson的数据从"+pjson);
+	       
 	        try {
 				URL curls = new URL(purl);
 				HttpsURLConnection connec = (HttpsURLConnection)curls.openConnection();
@@ -188,17 +188,13 @@ public class WeixinText extends Activity {
 					String preadlineString = null;
 					while ((preadlineString = pbufferedReader.readLine()) != null) {
 						pres += preadlineString;
-						Log.i("result","微信服务器返回来的数据为"+pres);
+						
 					}
 					pbufferedReader.close();
 					
 					
 				}
-				else{
-					
-					Log.i("result","微信的post请求有错");
-					
-				}
+				
 				
 				
 			} catch (MalformedURLException e) {
