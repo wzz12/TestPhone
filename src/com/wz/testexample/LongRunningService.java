@@ -30,9 +30,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-
-
-
 import android.annotation.SuppressLint;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -1531,11 +1528,15 @@ public void setTimerTask(){
 
 //启动AlarmReceiver,进而可以重新启动这个service
 public void startAlarm(){
+	if(TaskActivity.gd==0){
 	
-	
-	
+		Log.i("twoult","此时GD"+TaskActivity.gd);
 	Intent si = new Intent("android.intent.action.ALARMRECEIVER" );
-	 sendBroadcast(si);  
+	 sendBroadcast(si); 
+	 }else if(TaskActivity.gd != 0){
+		 Log.i("twoult","此时GD"+TaskActivity.gd);
+			Log.i("twoult","此时调用这个");
+	 }
 	
 
 	
@@ -1553,5 +1554,9 @@ public void cancleAlarm(){
 	managerc.cancel(pi);
 	
 }
+
+
+
+
 
 }

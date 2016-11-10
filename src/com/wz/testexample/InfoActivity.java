@@ -161,6 +161,7 @@ public class InfoActivity extends Activity {
 						MainActivity.class);
 
 				startActivity(intent);
+				finish();
 			}
 		});
 		
@@ -226,12 +227,25 @@ public class InfoActivity extends Activity {
 	public void onBackPressed() {
 		// TODO Auto-generated method stub
 		super.onBackPressed();
-		
+		finish();
 		Intent ii=new Intent(InfoActivity.this,MainActivity.class);
 		startActivity(ii);
 		overridePendingTransition(android.R.anim.fade_in,android.R.anim.fade_out);
 		
 	}
+
+/*	@Override
+	protected void onPause() {
+		// TODO Auto-generated method stub
+		super.onPause();
+		
+		finish();
+	}
+	
+	*/
+	
+	
+	
 	
 	
 	

@@ -43,7 +43,7 @@ public class MainActivity extends Activity {
 				Intent i = new Intent(MainActivity.this,InfoActivity.class);
 				startActivity(i);
 				//当点击设置按钮跳转到另一个页面时也关闭了当前页面
-				//finish();
+				finish();
 				
 
 			}
@@ -58,7 +58,7 @@ btr.setOnClickListener(new View.OnClickListener() {
 				
 				startActivity(tin);
 				//杀死了这个页面
-				
+				finish();
 				
 			
 				
@@ -68,6 +68,15 @@ btr.setOnClickListener(new View.OnClickListener() {
 		
 
 	}
+
+
+	/*@Override
+	protected void onPause() {
+		// TODO Auto-generated method stub
+		super.onPause();
+		
+		finish();
+	}*/
 
 
 	
