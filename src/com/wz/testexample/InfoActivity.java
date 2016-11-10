@@ -220,12 +220,7 @@ public class InfoActivity extends Activity {
 
 	}
 
-	@Override
-	protected void onPause() {
-		// TODO Auto-generated method stub
-		super.onPause();
-		finish();
-	}
+	
 
 	@Override
 	public void onBackPressed() {

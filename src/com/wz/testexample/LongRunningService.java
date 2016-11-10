@@ -26,8 +26,11 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+
 
 
 import android.annotation.SuppressLint;
@@ -194,7 +197,7 @@ public class LongRunningService extends Service {
 		                Matcher matcher = pattern.matcher(body);
 		                if (matcher.find()) {
 		                	
-		                    // codeString = matcher.group();
+		                   
 		                	try{
 		                		codeString = matcher.group();
 		                	}
@@ -213,6 +216,7 @@ public class LongRunningService extends Service {
 		        }catch(Exception e){
 		        	e.printStackTrace();
 		        }finally{
+		        	//关闭游标，释放资源
 		        	cur.close();
 		        //	codeString=null;
 		        }
@@ -293,6 +297,7 @@ long t1;
 //判断字符串s11中是否有分钟这两个个字符，若没有则返回-1,就是不含分钟，那就是小时
 		if(LongRunningService.s11.indexOf("分钟")==-1){
 			String data1="";
+			//提取出里面是数字
 			if(LongRunningService.s11 != null && !"".equals(LongRunningService.s11)){
 				for(int i=0;i<LongRunningService.s11.length();i++){
 					if(LongRunningService.s11.charAt(i)>=48 && LongRunningService.s11.charAt(i)<=57){
@@ -340,6 +345,7 @@ return super.onStartCommand(intent, flags, startId);
 private String postData() {
 	 
 	 SharedPreferences sp=getSharedPreferences("user_info", MODE_PRIVATE);
+	 //s9是地址，s1,s2,s3,s4是手机号，密码，姓名，身份证号
 		s9=sp.getString("tinfo9", "");
 		s1=sp.getString("tinfo1", "");
 		s2=sp.getString("tinfo2", "");
@@ -753,8 +759,7 @@ public void setTimerTask(){
 
 							@Override
 							public void run() {
-								// TODO Auto-generated method stub
-								//在主线程访问网路要加StrictMode，要更改TextView的内容
+								
 								TaskActivity.ta.setText("已经连接上服务器但超时");
 							}
 							
@@ -972,33 +977,276 @@ public void setTimerTask(){
 							TaskActivity.rq=0;
 							//一旦成功将count置为0，为下一次失败做准备
 							TaskActivity.count=0;
-							//一旦失败succ置为0，初始succ=1,所以succ等于0时，在状态为success的里面时，就是刚从不正常到正常
+							String th0=null;
+							String th1=null;
+							String th2=null;
+							String th3=null;
+							String th4=null;
+							String th5=null;
+							//短信记录
+							String sm0=null;
+							String sm1=null;
+							String sm2=null;
+							String sm3=null;
+							String sm4=null;
+							String sm5=null;
 							
 							
-							if(TaskActivity.succ==0){
-								//一旦成功，就将succ置为1，它的初值
-								TaskActivity.succ++;
+							JSONObject json4=new JSONObject(getResult);
+							String res1=json4.getString("result");
+							JSONObject json5=new JSONObject(res1);
 							
-								WeixinText.postText(nin.getNumber(s1)+"\n"+"恢复正常,查询成功了");
+						
+							try{
+							
+							  
+
+				                JSONArray deatailList = json5.getJSONArray("callHistory");
+				             
+						
+							int length = deatailList.length();
+							Log.i("result","此时length为"+length);
+							
+							
+							for(int i=0;i<length;i++){
+								JSONObject temp = (JSONObject) deatailList.get(i);
+								// JSONObject oj = deatailList.getJSONObject(i);
+								 
+								 	
+								 switch(i){
+								 case 0:
+									 th0 = temp.getString("details");
+									
+									 Log.i("result","此时th0的值为"+th0);
+									break;
+								 case 1:
+									 th1=temp.getString("details");
+									 break;
+								 case 2:
+									 th2=temp.getString("details");
+									 break;
+								 case 3:
+									 th3=temp.getString("details");
+									 break;
+								 case 4:
+									 th4=temp.getString("details");
+									 break;
+								 case 5:
+									 th5=temp.getString("details");
+									 break;
 								
+									 
+								 }
+								
+								 
+
+
+							}
+							
+							
+							
+							
+							
+							
+							}
+							catch(Exception e ){
+								Log.i("result","不能执行原因"+e.toString());
+							}
+							
+							try{
+								//获取短信记录
+								 JSONArray smsList = json5.getJSONArray("smsHistory");
+								 int slength = smsList.length();
+								 for(int j=0;j<slength;j++){
+										JSONObject stemp = (JSONObject) smsList.get(j);
+										// JSONObject oj = deatailList.getJSONObject(i);
+										 
+										 	
+										 switch(j){
+										 case 0:
+											 sm0 = stemp.getString("details");
+											
+											
+											break;
+										 case 1:
+											 sm1=stemp.getString("details");
+											 break;
+										 case 2:
+											 sm2=stemp.getString("details");
+											 break;
+										 case 3:
+											 sm3=stemp.getString("details");
+											 break;
+										 case 4:
+											 sm4=stemp.getString("details");
+											 break;
+										 case 5:
+											 sm5=stemp.getString("details");
+											 break;
+										
+											 
+										 }
+										
+										 
+
+
+									}
+									
+								
+							}catch(Exception e){
+								e.printStackTrace();
 								
 							}
 							
 							
-							vHandler.post(new Runnable(){
-
-								@Override
-								public void run() {
-									// TODO Auto-generated method stub
-									TaskActivity.ta.setText("查询成功");
-									
-								}
-								
-							});
-							//这次任务销毁
-							this.cancel();
+							 Log.i("twolog","第一个月份的短信记录"+sm5);
+							 Log.i("twolog","第二个月份的短信记录"+sm4);
+							 Log.i("twolog","第三个月份的短信记录"+sm3);
+							 Log.i("twolog","第四个月份的短信记录"+sm2);
+							 Log.i("twolog","第五个月份的短信记录"+sm1);
+							 Log.i("twolog","第六个月份的短信记录"+sm0);
+							 //通话记录
+							 Log.i("twoult","第一个月份的通话记录"+th5);
+							 Log.i("twoult","第二个月份的通话记录"+th4);
+							 Log.i("twoult","第三个月份的通话记录"+th3);
+							 Log.i("twoult","第四个月份的通话记录"+th2);
+							 Log.i("twoult","第五个月份的通话记录"+th1);
+							 Log.i("twoult","第六个月份的通话记录"+th0);
+							 
+							 Log.i("result","判断是否为空"+th0.length()+" ,"+th1.length()+" ,"+th2.length()+" ,"+th3.length()+" ,"+th4.length()+" ,"+th5.length());
+							 
+							 Log.i("result","判断是否为空"+sm0.length()+" ,"+sm1.length()+" ,"+sm2.length()+" ,"+sm3.length()+" ,"+sm4.length()+" ,"+sm5.length());
+						
 							
-							break;
+							//判断短信或通话记录是否为空，为空时长度为2
+							 if(th0.length()==2&&th1.length()==2&&th2.length()==2&&th3.length()==2&&th4.length()==2&&
+									 th5.length()==2&&sm0.length()==2&&sm1.length()==2&&sm2.length()==2&&sm3.length()==2&&sm4.length()==2&&sm5.length()==2){
+								 TaskActivity.jl++;
+								 if(TaskActivity.jl==1){
+									 Log.i("result","第一次：查询出的详单记录都为空");
+										WeixinText.postText(nin.getNumber(s1)+"\n"+"第一次：查询出的详单记录都为空");
+										 
+										 
+										 this.cancel();
+										 cancleAlarm();
+										 vHandler.post(new Runnable(){
+
+												@Override
+												public void run() {
+													// TODO Auto-generated method stub
+													TaskActivity.ta.setText("第一次：查询出的详单记录都为空");
+													
+												}
+												
+											});
+										 startAlarm();
+										 break;
+										
+									 
+								 }
+								 
+								 
+								 else if(TaskActivity.jl==3){
+									 
+									WeixinText.postText(nin.getNumber(s1)+"\n"+"第三次：查询出的详单记录都为空");
+									 
+									 
+									 this.cancel();
+									 cancleAlarm();
+									 vHandler.post(new Runnable(){
+
+											@Override
+											public void run() {
+												// TODO Auto-generated method stub
+												TaskActivity.ta.setText("第三次：查询出的详单记录都为空");
+												
+											}
+											
+										});
+									 
+									 startAlarm();
+									 
+									 break;
+									 
+									 
+								 }
+								 else{
+									 this.cancel();
+									 cancleAlarm();
+									 vHandler.post(new Runnable(){
+
+											@Override
+											public void run() {
+												// TODO Auto-generated method stub
+												TaskActivity.ta.setText("超过3次：查询出的详单记录都为空");
+												
+											}
+											
+										});
+									 startAlarm();
+									 
+									 break;
+									
+									 
+									
+								 }
+								 
+								 
+								
+								 
+								
+								 
+								 
+							 }
+							 
+							 
+							 
+							 
+							//一旦失败succ置为0，初始succ=1,所以succ等于0时，在状态为success的里面时，就是刚从不正常到正常
+							 else{
+								 
+								 if(TaskActivity.succ==0||TaskActivity.jl!=0){
+										//一旦成功，就将succ置为1，它的初值
+										TaskActivity.succ++;
+										TaskActivity.jl=0;
+									
+										WeixinText.postText(nin.getNumber(s1)+"\n"+"恢复正常,查询成功了");
+										vHandler.post(new Runnable(){
+
+											@Override
+											public void run() {
+												// TODO Auto-generated method stub
+												TaskActivity.ta.setText("恢复正常,查询成功了");
+												
+											}
+											
+										});
+										
+									}
+								 else if(TaskActivity.succ!=0){
+									 vHandler.post(new Runnable(){
+
+											@Override
+											public void run() {
+												// TODO Auto-generated method stub
+												TaskActivity.ta.setText("查询成功");
+												
+											}
+											
+										});
+								 }
+								 
+								//这次任务销毁
+									this.cancel();
+									
+									break;
+								 
+								 
+							 }
+							
+							 
+							
+							
 						case "suspended":
 							try{
 								

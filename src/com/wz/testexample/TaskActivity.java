@@ -56,7 +56,7 @@ import android.widget.Toast;
 	 public static int succ=1;
 	//ff是记录fresu错误时，和非法的签名id和secret即包含此号码暂时不可用错误时,mb是记录目标服务器不存在或已关机的
 	public static  int ff,mb,mc,rq=0;
-	
+	public static int jl=0;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
